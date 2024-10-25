@@ -422,7 +422,7 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                                                                                 }
                                                                             })}
                                                                         {reason == "Product Overage" &&
-                                                                            productList.map((ele, index) => {
+                                                                            productList?.map((ele, index) => {
                                                                                 return (
                                                                                     <ErrorProductCard Styles1={Styles1} productErrorHandler={productErrorHandler} errorList={errorList} setProductDetailId={setProductDetailId} product={ele} productImage={productImage} reason={reason} AccountName={item.AccountName} ErrorProductQtyHandler={ErrorProductQtyHandler}
                                                                                         readOnly={orderConfirmed} style={{ cardHolder: { backgroundColor: '#67f5f533', borderBottom: '1px solid #fff' }, nameHolder: { width: '300px' } }} />
@@ -465,7 +465,7 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                                                     </div>
                                                 </div>
                                                 <div className={Styles1.totalProductPrice} >
-                                                    {(orderId && (!searchPo || searchPo == "")) && <>
+                                                       {(orderId && (!searchPo || searchPo == "")) && <>
                                                         <div className={Styles1.Margitotal}>
                                                             <p className={Styles1.detailsTitleHolder}>Customer Support For</p>
                                                             <p className={Styles1.detailsDescHolder}>Customer Service</p>
