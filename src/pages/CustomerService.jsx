@@ -10,7 +10,6 @@ import Loading from "../components/Loading.jsx";
 import ModalPage from "../components/Modal UI/index.js";
 import LoaderV3 from "../components/loader/v3.js";
 import AppLayout from "../components/AppLayout.jsx";
-
 const CustomerService = () => {
   const { state } = useLocation();
   let Reason = null;
@@ -108,7 +107,8 @@ const CustomerService = () => {
       });
   }, []);
 
-  const SubmitHandler = () => {
+  const SubmitHandler = (event) => {
+    event.preventDefault();
     setIsDisabled(true)
     GetAuthData()
       .then((user) => {
@@ -158,15 +158,16 @@ const CustomerService = () => {
                     setIsDisabled(false);
                     uploadFileSupport({ key: user.x_access_token, supportId: response, files }).then((fileUploader) => {
                       setIsDisabled(false)
+                      console.log(fileUploader,"fileUploader")
                       if (fileUploader) {
-                        navigate("/CustomerSupportDetails?id=" + response);
+                        navigate("/CustomerSupportDetails", { state: { id: response } });
                       }
                     }).catch((fileErr) => {
                       console.log({ fileErr });
                     })
                   } else {
                     setIsDisabled(false);
-                    navigate("/CustomerSupportDetails?id=" + response);
+                    navigate("/CustomerSupportDetails", { state: { id: response } });
                   }
                 }
               }
@@ -192,7 +193,7 @@ const CustomerService = () => {
               Are you sure you want to generate a ticket?<br /> This action cannot be undone.<br /> You will be redirected to the ticket page after the ticket is generated.
             </p>
             <div className="d-flex justify-content-around ">
-              <button disabled={isDisabled} style={{ backgroundColor: '#000', color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: '600', height: '30px', letterSpacing: '1.4px', lineHeight: 'normal', width: '100px' }} onClick={() => { SubmitHandler() }}>
+              <button disabled={isDisabled} style={{ backgroundColor: '#000', color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: '600', height: '30px', letterSpacing: '1.4px', lineHeight: 'normal', width: '100px' }} onClick={(e) => { SubmitHandler(e) }}>
                 Yes
               </button>
               <button style={{ backgroundColor: '#000', color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: '600', height: '30px', letterSpacing: '1.4px', lineHeight: 'normal', width: '100px' }} onClick={() => setConfirm(false)}>

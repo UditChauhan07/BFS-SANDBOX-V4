@@ -39,10 +39,12 @@ import HelpSection from "./pages/HelpSection";
 import PortalHelp from "./pages/PortalHelp";
 import { CartProvider } from "./context/CartContent";
 import CartHover from "./components/CartHover";
+import { RefreshProvider } from "./context/RefreshContext";
 
 function App() {
   return (
     <UserProvider>
+      <RefreshProvider>
       <CartProvider>
         <BrowserRouter>  <HubSpotTracker />
           <CartHover />
@@ -60,7 +62,7 @@ function App() {
             <Route path="/orderDetails" element={<MyBagOrder />}></Route>
             <Route path="/customer-care" element={<CustomerCare />}></Route>
             <Route path="/customer-support" element={<CustomerSupport />}></Route>
-            <Route path="/CustomerSupportDetails" element={<CustomerSupportDetails />} ></Route>
+            <Route path="/CustomerSupportDetails" element={<CustomerSupportDetails key={Date.now()} />} ></Route>
             <Route path="/new-arrivals" element={<NewArrivals />}></Route>
             <Route path="/marketing-calendar" element={<MarketingCalendar />} ></Route>
             <Route path="/education-center" element={<EducationCenter />}></Route>
@@ -88,6 +90,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       </CartProvider>
+      </RefreshProvider>
     </UserProvider>
   );
 }

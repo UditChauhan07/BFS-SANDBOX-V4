@@ -1,7 +1,6 @@
 export const originAPi = process.env.REACT_APP_OA_URL || "https://temp.beautyfashionsales.com"
 // export const originAPi = "https://dev.beautyfashionsales.com"
-// export const originAPi = "http://localhost:2611"
-
+// export const originAPi = "http://localhost:2611";
 let url = `${originAPi}/retailer/`;
 let url2 = `${originAPi}/retailerv2/`;
 const orderKey = "orders";
@@ -28,7 +27,14 @@ export const months = [
   "November",
   "December",
 ];
-export const admins = ["00530000005AdvsAAC", "0053b00000DgEVEAA3", "0051O00000CvAVTQA3", "0053b00000CwOnLAAV" ,  "0053b00000C75e8AAB" , "0053b00000DgEvqAAF"]; //, "0053b00000CwOnLAAV" ,"0053b00000DgEVEAA3"
+export const admins = [
+  "00530000005AdvsAAC",
+  "0053b00000DgEVEAA3",
+  "0051O00000CvAVTQA3",
+  "0053b00000CwOnLAAV",
+  "0053b00000C75e8AAB",
+  "0053b00000DgEvqAAF",
+]; //, "0053b00000CwOnLAAV" ,"0053b00000DgEVEAA3"
 
 export function ShareDrive(data, remove = false) {
   if (remove) {
@@ -36,7 +42,7 @@ export function ShareDrive(data, remove = false) {
     return true;
   }
   if (data) {
-    localStorage.setItem(shareKey, JSON.stringify(data))
+    localStorage.setItem(shareKey, JSON.stringify(data));
     return true;
   } else {
     let strData = localStorage.getItem(shareKey);
@@ -52,9 +58,9 @@ export async function AuthCheck() {
     return false;
   }
 }
-export const sortArrayHandler = (arr, getter, order = 'asc') =>
+export const sortArrayHandler = (arr, getter, order = "asc") =>
   arr.sort(
-    order === 'desc'
+    order === "desc"
       ? (a, b) => getter(b).localeCompare(getter(a))
       : (a, b) => getter(a).localeCompare(getter(b))
   );
@@ -62,42 +68,123 @@ export const sortArrayHandler = (arr, getter, order = 'asc') =>
 export function fetchBeg() {
   let orderStr = localStorage.getItem("AA0KfX2OoNJvz7x");
 
-
   if (orderStr) {
     let orderList = JSON.parse(orderStr);
 
     return orderList;
   }
 }
+export async function DownloadAttachment(token, attachmentId) {
+  console.log(token, "token download", attachmentId, "attachmentID");
+  try {
+    let response = await fetch(
+      `${originAPi}/getAttachment/downloadAttachment/${attachmentId}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response) {
+      if (response.status == 300) {
+        DestoryAuth();
+      } else {
+        return response;
+      }
+    }
+  } catch (error) {
+    return error;
+  }
+}
+// export async function getAttachment(token, customerSupportId) {
+//   if (!token || !customerSupportId) {
+//     console.log("Token or Customer Support ID is not available yet.");
+//     return;
+//   }
 
+//   try {
+//     console.log(token, customerSupportId, "rawData");
+//     const timestamp = new Date().getTime();
+//     let response = await fetch(`${originAPi}/getAttachment/getAttachment?ts=${timestamp}`, {
+//       method: "POST",
+//       body: JSON.stringify({ customerSupportId }),
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     if (!response) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
+
+//     let data = await response.json();
+//     console.log(data, "backend attachment");
+
+//     if (data.status === 300) {
+//       DestoryAuth();
+//     } else {
+//       return data;
+//     }
+//   } catch (error) {
+//     console.error(error, "backend get attachment error");
+//     return error;
+//   }
+// }
+
+
+export async function getAttachment(token, caseId) {
+  try {
+    console.log(token, caseId, "rawData");
+    const response = await fetch(originAPi + "/getAttachment/getAttachment", {
+      method: "POST",
+      body: JSON.stringify({ caseId }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data, "backend attachment");
+    if (data.status === 300) {
+      DestoryAuth();
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.log(error, "backend get attachment error");
+    return null;
+  }
+}
 
 export async function POGenerator() {
   try {
-
     let orderDetails = fetchBeg();
     if (orderDetails.Manufacturer?.id && orderDetails.Account?.id) {
-
       let date = new Date();
 
       //  const response = await fetch( "http://localhost:2611/PoNumber/generatepo"
-      const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov2", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          accountName: orderDetails.Account?.name,
-          manufacturerName: orderDetails.Manufacturer?.name,
-          orderDate: date.toISOString(),
-          accountId: orderDetails.Account?.id,
-          manufacturerId: orderDetails.Manufacturer?.id
-        }),
-      });
+      const response = await fetch(
+        originAPi + "/qX8COmFYnyAj4e2/generatepov2",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            accountName: orderDetails.Account?.name,
+            manufacturerName: orderDetails.Manufacturer?.name,
+            orderDate: date.toISOString(),
+            accountId: orderDetails.Account?.id,
+            manufacturerId: orderDetails.Manufacturer?.id,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
 
       const poData = await response.json();
 
@@ -106,17 +193,45 @@ export async function POGenerator() {
 
         return await generatedPONumber;
       } else {
-        console.error('Failed to generate PO number:', poData.message);
+        console.error("Failed to generate PO number:", poData.message);
         return null;
       }
     } else {
       return null;
     }
   } catch (error) {
-    console.error('Error generating PO number:', error.message);
+    console.error("Error generating PO number:", error.message);
     return null;
   }
 }
+export const getSkKeys = async (manufacturerId,token,AccountId) => {
+  console.log(manufacturerId,token,AccountId,"backend response data")
+  try {
+    const response = await fetch(`${originAPi}/getKeys/getKeys`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+       'Authorization': `Bearer ${token}`
+        },
+      body: JSON.stringify({
+        manufacturerId: manufacturerId ,
+        AccountId:AccountId
+      })
+    });
+
+    if (!response) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data,"backend data")
+    return data; 
+  } catch (error) {
+    console.error("Error fetching keys:", error);
+    throw error; 
+  }
+};
+
 
 // Helper function to generate codes
 export function getStrCode(str) {
@@ -124,9 +239,15 @@ export function getStrCode(str) {
   let codeLength = str.split(" ");
 
   if (codeLength.length >= 2) {
-    return `${codeLength[0].charAt(0).toUpperCase() + codeLength[1].charAt(0).toUpperCase()}`;
+    return `${
+      codeLength[0].charAt(0).toUpperCase() +
+      codeLength[1].charAt(0).toUpperCase()
+    }`;
   } else {
-    return `${codeLength[0].charAt(0).toUpperCase() + codeLength[0].charAt(codeLength[0].length - 1).toUpperCase()}`;
+    return `${
+      codeLength[0].charAt(0).toUpperCase() +
+      codeLength[0].charAt(codeLength[0].length - 1).toUpperCase()
+    }`;
   }
 }
 
@@ -144,11 +265,17 @@ function padNumber(n, isTwoDigit) {
 
 export function formatNumber(num) {
   if (num >= 0 && num < 1000000) {
-    return (num / 1000).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "K";
+    return (
+      (num / 1000).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "K"
+    );
   } else if (num >= 1000000) {
-    return (num / 1000000).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "M";
+    return (
+      (num / 1000000).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "M"
+    );
   } else if (num < 0) {
-    return (num / 1000).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "K";
+    return (
+      (num / 1000).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "K"
+    );
   } else {
     return num;
   }
@@ -171,16 +298,13 @@ export function supportClear() {
   }
 }
 
-
-
-
 export async function DestoryAuth() {
-  for (var key in localStorage) {
-    if (localStorage.hasOwnProperty(key) && (key != "AA0KfX2OoNJvz7x" && key != "passwordB2B" && key != "emailB2B")) {
-      localStorage.removeItem(key);
-    }
-  }
-  window.location.href = window.location.origin;
+  // for (var key in localStorage) {
+  //   if (localStorage.hasOwnProperty(key) && (key != "AA0KfX2OoNJvz7x" && key != "passwordB2B" && key != "emailB2B")) {
+  //     localStorage.removeItem(key);
+  //   }
+  // }
+  // window.location.href = window.location.origin;
   return true;
 }
 
@@ -191,7 +315,6 @@ export async function GetAuthData() {
     return JSON.parse(localStorage.getItem("jAuNW7c6jdi6mg7"))?.data;
   }
 }
-
 
 export async function getOrderofSalesRep({ user, month }) {
   let headersList = {
@@ -259,7 +382,6 @@ export async function getOrderDetailsInvoice({ rawData }) {
   }
 }
 
-
 export async function getSupportFormRaw({ rawData }) {
   let headersList = {
     Accept: "*/*",
@@ -298,7 +420,7 @@ export async function getAllAccount({ user }) {
   });
   let data = JSON.parse(await response.text());
   if (data.status == 300) {
-    DestoryAuth()
+    DestoryAuth();
   } else {
     return data.data;
   }
@@ -324,23 +446,24 @@ export async function postSupport({ rawData }) {
 }
 export async function uploadFileSupport({ key, supportId, files }) {
   if (files.length) {
-
     let headersList = {
-      "Accept": "*/*", key, supportId
-    }
+      Accept: "*/*",
+      key,
+      supportId,
+    };
     let bodyContent = new FormData();
     files.map((file) => {
       bodyContent.append("files", file.file);
-    })
+    });
     let response = await fetch(originAPi + "/unCb9Coo4FFqCtG/w72MrdYNHfsSsqe", {
       method: "POST",
       body: bodyContent,
-      headers: headersList
+      headers: headersList,
     });
 
     let data = JSON.parse(await response.text());
     if (data) {
-      return data.data
+      return data.data;
     }
   }
 }
@@ -383,7 +506,6 @@ export async function getOrderProduct({ rawData }) {
 }
 
 export async function cartSync({ cart }) {
-
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -404,7 +526,8 @@ export async function cartSync({ cart }) {
 
 export async function OrderPlaced({ order, cartId }) {
   let orderinit = {
-    info: order, cartId
+    info: order,
+    cartId,
   };
   let headersList = {
     "Content-Type": "application/json",
@@ -429,7 +552,7 @@ export async function OrderPlaced({ order, cartId }) {
     DestoryAuth();
   } else {
     if (data?.data) {
-      return data.data
+      return data.data;
     } else {
       return false;
     }
@@ -589,13 +712,19 @@ export async function getSupportDetails({ rawData }) {
   }
 }
 
-export async function getTargetReportAll({ user, year, preOrder, accountIds = null }) {
+export async function getTargetReportAll({
+  user,
+  year,
+  preOrder,
+  accountIds = null,
+}) {
   if (user) {
     let headersList = {
       Accept: "*/*",
       key: user?.data?.x_access_token,
       accountIds: accountIds || JSON.stringify(user?.data?.accountIds),
-      year, preOrder
+      year,
+      preOrder,
     };
     let response = await fetch(url2 + "/K2uJd7bnERtviUv", {
       method: "POST",
@@ -605,11 +734,11 @@ export async function getTargetReportAll({ user, year, preOrder, accountIds = nu
     if (data.status == 300) {
       DestoryAuth();
     } else {
-      let rawRes = { ownerPermission: false, list: data.data }
+      let rawRes = { ownerPermission: false, list: data.data };
       return rawRes;
     }
   } else {
-    return false
+    return false;
   }
 }
 
@@ -678,7 +807,6 @@ export async function getProductImageAll({ rawData }) {
 
   // let response = await fetch(url + "v3/Ftr7xyLKqgFo5MO", {
   let response = await fetch(url + "hm8CnzTBfdfjXLZ", {
-
     method: "POST",
     body: JSON.stringify(rawData),
     headers: headersList,
@@ -765,7 +893,12 @@ export async function getSessionStatus({ key, salesRepId }) {
   }
 }
 
-export async function getMarketingCalendar({ key, manufacturerId, year, accountIds }) {
+export async function getMarketingCalendar({
+  key,
+  manufacturerId,
+  year,
+  accountIds,
+}) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -808,7 +941,13 @@ export async function getOrderDetailsPdf({ key, opportunity_id }) {
   }
 }
 
-export async function getMarketingCalendarPDF({ key, manufacturerId, month, manufacturerStr, year }) {
+export async function getMarketingCalendarPDF({
+  key,
+  manufacturerId,
+  month,
+  manufacturerStr,
+  year,
+}) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -826,7 +965,13 @@ export async function getMarketingCalendarPDF({ key, manufacturerId, month, manu
   }
 }
 
-export async function getMarketingCalendarPDFV2({ key, manufacturerId, month, manufacturerStr, year }) {
+export async function getMarketingCalendarPDFV2({
+  key,
+  manufacturerId,
+  month,
+  manufacturerStr,
+  year,
+}) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -844,7 +989,13 @@ export async function getMarketingCalendarPDFV2({ key, manufacturerId, month, ma
   }
 }
 
-export async function getMarketingCalendarPDFV3({ key, manufacturerId, month, manufacturerStr, year }) {
+export async function getMarketingCalendarPDFV3({
+  key,
+  manufacturerId,
+  month,
+  manufacturerStr,
+  year,
+}) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -862,7 +1013,6 @@ export async function getMarketingCalendarPDFV3({ key, manufacturerId, month, ma
     return data?.file || false;
   }
 }
-
 
 export async function getAllAccountLocation({ key, accountIds }) {
   let headersList = {
@@ -902,7 +1052,12 @@ export async function getAllAccountBrand({ key, accountIds }) {
     return data?.data || [];
   }
 }
-export async function getAllAccountOrders({ key, accountIds, month, date = null }) {
+export async function getAllAccountOrders({
+  key,
+  accountIds,
+  month,
+  date = null,
+}) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -994,7 +1149,7 @@ export const hexabrand = {
   a0O1O00000XYBvkUAH: "#6D243E",
   a0O1O00000XYBvaUAH: "#4B95DD",
   a0ORb000000nDfFMAU: "#073763",
-  a0ORb000000nDIiMAM: "#7f6000"
+  a0ORb000000nDIiMAM: "#7f6000",
 };
 
 export const hexabrandText = {
@@ -1015,103 +1170,126 @@ export const hexabrandText = {
   a0O1O00000XYBvkUAH: "#ffffff",
   a0O1O00000XYBvaUAH: "#ffffff",
   a0ORb000000nDfFMAU: "#deb887",
-  a0ORb000000nDIiMAM: "#deb887"
+  a0ORb000000nDIiMAM: "#deb887",
 };
 
-export const brandDetails =
-{
+export const brandDetails = {
   a0O3b00000hym7GEAQ: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/Byredo%20Ben%20Gorham-main.6dd86132b5ca75e66104.jpg" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/Byredo%20Ben%20Gorham-main.6dd86132b5ca75e66104.jpg",
+    },
     tagLine: "REINVENTING THE WORLD OF LUXURY.",
-    desc: '<p class="seti">Byredo is a European luxury brand founded in Stockholm in 2006 by Ben Gorham, with an ambition to translate memories and emotions into products and experiences.</p><p class="seti">Byredo is reinventing the world of luxury through a new approach, where creation is led by emotions, expressing a full and limitless brand universe.</p><p class="seti">Byredo conceives objects using the highest quality materials available, and high-end design details to fuel a renewed approach to modern luxury.</p><p class="seti">Byredo creates and develops a range of products such as fragrance, makeup, home, leather goods and accessories, and is sold in more than 40 countries in a very high-end exclusive network worldwide. We believe that through creativity, we are able to develop timeless products, both meaningful and inspirational, to people and their lives.</p><p class="seti">A native Swede, born to an Indian mother and a Canadian father, Ben grew up in Toronto, New York and Stockholm. He graduated from the Stockholm art school with a degree in fine arts, but a chance meeting with perfumer Pierre Wulff convinced him that he`d rather create fragrances than paintings. With no formal training in the field, Gorham, 31 years old , sought out the services of world renowned perfumers Olivia Giacobetti and Jerome Epinette, explaining his olfactory desires and letting them create the compositions. As an outsider in the beauty industry, Ben is somewhat of an anomaly and has been recognized for his personal style and connection to fashion and art in several international magazines such as French Vogue, Vanity Fair, Elle, V Magazine and Fantastic Man to name a few.</p>'
+    desc: '<p class="seti">Byredo is a European luxury brand founded in Stockholm in 2006 by Ben Gorham, with an ambition to translate memories and emotions into products and experiences.</p><p class="seti">Byredo is reinventing the world of luxury through a new approach, where creation is led by emotions, expressing a full and limitless brand universe.</p><p class="seti">Byredo conceives objects using the highest quality materials available, and high-end design details to fuel a renewed approach to modern luxury.</p><p class="seti">Byredo creates and develops a range of products such as fragrance, makeup, home, leather goods and accessories, and is sold in more than 40 countries in a very high-end exclusive network worldwide. We believe that through creativity, we are able to develop timeless products, both meaningful and inspirational, to people and their lives.</p><p class="seti">A native Swede, born to an Indian mother and a Canadian father, Ben grew up in Toronto, New York and Stockholm. He graduated from the Stockholm art school with a degree in fine arts, but a chance meeting with perfumer Pierre Wulff convinced him that he`d rather create fragrances than paintings. With no formal training in the field, Gorham, 31 years old , sought out the services of world renowned perfumers Olivia Giacobetti and Jerome Epinette, explaining his olfactory desires and letting them create the compositions. As an outsider in the beauty industry, Ben is somewhat of an anomaly and has been recognized for his personal style and connection to fashion and art in several international magazines such as French Vogue, Vanity Fair, Elle, V Magazine and Fantastic Man to name a few.</p>',
   },
   a0O3b00000fQrZyEAK: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/Diptyque-main.58df6e56a34604ee019f.webp" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/Diptyque-main.58df6e56a34604ee019f.webp",
+    },
     tagLine: "AN OLFACTORY JOURNEY.",
-    desc: '<p class="seti">For Diptyque, creating fragrances is an art and art is a journey. An imaginary journey of the mind and the senses across olfactory landscapes, far from the paths that others take, in search of rare raw materials and unexpected accords. A journey between the past and the future, between tradition and the avant-garde, toward another place where history, new ideas, and disruption combine.</p><p class="seti">Diptyque is always in between two worlds, finding its balance between dreams and reality, free from traditional gender codes or cultural boundaries, committed to developing connections and blends that nourish its inspiration. It is a creator of essences and images where the eye, the hand, and the nose are united to constantly revisit the surprising world of Haute Parfumerie.</p>'
+    desc: '<p class="seti">For Diptyque, creating fragrances is an art and art is a journey. An imaginary journey of the mind and the senses across olfactory landscapes, far from the paths that others take, in search of rare raw materials and unexpected accords. A journey between the past and the future, between tradition and the avant-garde, toward another place where history, new ideas, and disruption combine.</p><p class="seti">Diptyque is always in between two worlds, finding its balance between dreams and reality, free from traditional gender codes or cultural boundaries, committed to developing connections and blends that nourish its inspiration. It is a creator of essences and images where the eye, the hand, and the nose are united to constantly revisit the surprising world of Haute Parfumerie.</p>',
   },
   a0O1O00000XYBvQUAX: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/rms-main.d3808346ce74c6385895.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/rms-main.d3808346ce74c6385895.png",
+    },
     tagLine: "MASTERFULLY MADE. BEAUTIFULLY CLEAN.",
-    desc: '<p class="seti">A pioneer of the clean beauty movement, Rose-Marie Swift is the founder and the spirit of the brand. A master makeup artist for over 30 years, her lightbulb moment was realizing that cosmetics could be made with better, safer ingredients while simultaneously making women more beautiful. Bold, authentic, and unwavering in her quest for innovative clean ingredients that perform, she launched RMS in 2009 to clean up the industry and set a higher standard for beauty.</p><p class="seti"> If you know...you know. Just ask the world’s top supermodels and a community of loyal followers who have worn RMS for over a decade. As a professional makeup artist, it was important to Rose-Marie that RMS products were not only safe to use but could also be beautiful and long-lasting on a photo shoot, a runway show, and, of course, every day.</p><p class="seti"> RMS products are simple to understand, easy to use, and showcase the need for pure, simple, plant-based, skin-loving ingredients - and the beauty of radiant, glowing, natural human skin.</p>'
+    desc: '<p class="seti">A pioneer of the clean beauty movement, Rose-Marie Swift is the founder and the spirit of the brand. A master makeup artist for over 30 years, her lightbulb moment was realizing that cosmetics could be made with better, safer ingredients while simultaneously making women more beautiful. Bold, authentic, and unwavering in her quest for innovative clean ingredients that perform, she launched RMS in 2009 to clean up the industry and set a higher standard for beauty.</p><p class="seti"> If you know...you know. Just ask the world’s top supermodels and a community of loyal followers who have worn RMS for over a decade. As a professional makeup artist, it was important to Rose-Marie that RMS products were not only safe to use but could also be beautiful and long-lasting on a photo shoot, a runway show, and, of course, every day.</p><p class="seti"> RMS products are simple to understand, easy to use, and showcase the need for pure, simple, plant-based, skin-loving ingredients - and the beauty of radiant, glowing, natural human skin.</p>',
   },
   a0O3b00000pY2vqEAC: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/revive-main.6f1d78477450b18ea9ab.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/revive-main.6f1d78477450b18ea9ab.png",
+    },
     tagLine: "RESEARCH. RENEWAL. RESULTS",
-    desc: '<p class="seti"><b>GIVE NEW LIFE TO SKIN.</b></p><p class="seti">A high-performance, luxury skincare line developed by plastic and reconstructive surgeon Dr. Gregory Bays Brown in 1997. RéVive formulas unlock the power of Bio-Renewal Technology, a cutting edge science, which visibly transforms renews, restoring skin to a younger, healthier, more supple version of itself. This collection of bio-engineered, skin-identical peptides mimic your own bio-renewal process to help restore skin`s youthful glow.</p><p class="seti"> RéBuild your skin, from the inside, out.</p>'
+    desc: '<p class="seti"><b>GIVE NEW LIFE TO SKIN.</b></p><p class="seti">A high-performance, luxury skincare line developed by plastic and reconstructive surgeon Dr. Gregory Bays Brown in 1997. RéVive formulas unlock the power of Bio-Renewal Technology, a cutting edge science, which visibly transforms renews, restoring skin to a younger, healthier, more supple version of itself. This collection of bio-engineered, skin-identical peptides mimic your own bio-renewal process to help restore skin`s youthful glow.</p><p class="seti"> RéBuild your skin, from the inside, out.</p>',
   },
   a0O3b00000p80IJEAY: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/Bb.Brand-main.2d847754b231e7165727.jpg" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/Bb.Brand-main.2d847754b231e7165727.jpg",
+    },
     tagLine: "SUSTAINABLE LUXURY.",
-    desc: '<p class="seti">Bumble and bumble began as an New York City salon in 1977, where we clipped, colored, and styled our way into prominence – with a strong design aesthetic and extraordinary products; in magazines, on runways, and backstage worldwide. Bumble and bumble has over 40+ years of salon industry expertise, owns and operates two leading flagship salons in NYC, and has salon partnerships with over 1500 independently owned salons all across North America.</p><p class="seti">Bumble and bumble is inspired by masters of the craft: hairstylists and colorists obsessed with technical and artistic excellence through bold self-expression. Bumble and bumble invents products to meet these professional, exacting standards that are also easy enough for anyone to use: from the iconic wave-enhancing Surf Spray to the best-selling mega-moisturizing Hairdresser`s Invisible Oil range. These well-loved products are used by pros in Bumble and bumble salons and by millions of people around the world at home every day. Bumble and bumble creates products for all hair types, textures, and style preferences with uncompromising quality to instantly elevate your personal style with an effortlessly modern look. We are deeply, passionately, and fearlessly dedicated to the craft of hair. </p>'
+    desc: '<p class="seti">Bumble and bumble began as an New York City salon in 1977, where we clipped, colored, and styled our way into prominence – with a strong design aesthetic and extraordinary products; in magazines, on runways, and backstage worldwide. Bumble and bumble has over 40+ years of salon industry expertise, owns and operates two leading flagship salons in NYC, and has salon partnerships with over 1500 independently owned salons all across North America.</p><p class="seti">Bumble and bumble is inspired by masters of the craft: hairstylists and colorists obsessed with technical and artistic excellence through bold self-expression. Bumble and bumble invents products to meet these professional, exacting standards that are also easy enough for anyone to use: from the iconic wave-enhancing Surf Spray to the best-selling mega-moisturizing Hairdresser`s Invisible Oil range. These well-loved products are used by pros in Bumble and bumble salons and by millions of people around the world at home every day. Bumble and bumble creates products for all hair types, textures, and style preferences with uncompromising quality to instantly elevate your personal style with an effortlessly modern look. We are deeply, passionately, and fearlessly dedicated to the craft of hair. </p>',
   },
   a0O3b00000lCFmREAW: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/Smashbox.a7d1cb75ff5bffb7c858.jpg" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/Smashbox.a7d1cb75ff5bffb7c858.jpg",
+    },
     tagLine: "CREATIVITY, COMMUNITY, AND COLLABORATION.",
-    desc: '<p class="seti">Everyone has a story. Ours is original and authentic and sets us apart from every other beauty brand. We`re proud of our story, and this is how we tell it: We live for lipstick. We get excited about primers. (No, seriously, we do.) But mostly, we love sharing our makeup secrets with you. Why? Because creativity and collaboration are at the core of our DNA. We are the only brand born out of a legendary photo studio — Smashbox Studios in Los Angeles — where major photographers, celebrities and makeup artists converge to create iconic images every day. Studio-tested, shockingly high-performance. Longwearing and skincaring. Artistry made easy. Hardworking makeup that keeps up with you.</p>'
+    desc: '<p class="seti">Everyone has a story. Ours is original and authentic and sets us apart from every other beauty brand. We`re proud of our story, and this is how we tell it: We live for lipstick. We get excited about primers. (No, seriously, we do.) But mostly, we love sharing our makeup secrets with you. Why? Because creativity and collaboration are at the core of our DNA. We are the only brand born out of a legendary photo studio — Smashbox Studios in Los Angeles — where major photographers, celebrities and makeup artists converge to create iconic images every day. Studio-tested, shockingly high-performance. Longwearing and skincaring. Artistry made easy. Hardworking makeup that keeps up with you.</p>',
   },
   a0ORb000000BQ0nMAG: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/VictoriaBeckhamBeauty.d9fff66659d48dffd704.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/VictoriaBeckhamBeauty.d9fff66659d48dffd704.png",
+    },
     tagLine: "PURE EXCELLENCE IN EVERY WAY. THAT'S THE VICTORIA STANDARD.",
-    desc: '<p class="seti">Through the perfume of memory, Victoria Beckham distills the notes of eras and atmospheres into fragrances founded in personal yet universal associations. Drawing on stages of her life and their parallels to a pop culture shared by all, each scent captures her own recollections of distinct times, places, and experiences and mirrors them in our collective and individual reminiscences.</p>'
+    desc: '<p class="seti">Through the perfume of memory, Victoria Beckham distills the notes of eras and atmospheres into fragrances founded in personal yet universal associations. Drawing on stages of her life and their parallels to a pop culture shared by all, each scent captures her own recollections of distinct times, places, and experiences and mirrors them in our collective and individual reminiscences.</p>',
   },
   a0O3b00000p7zqKEAQ: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/bobbi-brown-main.d67c6c3e9732a993f1c2.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/bobbi-brown-main.d67c6c3e9732a993f1c2.png",
+    },
     tagLine: "BEGIN WITH SKIN. GLOW FROM WITHIN.",
-    desc: '<p class="seti">In 1991, Bobbi Brown was founded by a female makeup artist in New York, designed for the world--your world. We offer approachable artistry and create beauty must-haves that look good, work hard, and stay fresh every hour of the day.</p><p class="seti">We remain women-first, champions of individual beauty, original owners of healthy, glowing skin, with the most premium products and effortless artistry, and expanding the brand and line in a way that is even more relevant to today’s consumer.</p>'
+    desc: '<p class="seti">In 1991, Bobbi Brown was founded by a female makeup artist in New York, designed for the world--your world. We offer approachable artistry and create beauty must-haves that look good, work hard, and stay fresh every hour of the day.</p><p class="seti">We remain women-first, champions of individual beauty, original owners of healthy, glowing skin, with the most premium products and effortless artistry, and expanding the brand and line in a way that is even more relevant to today’s consumer.</p>',
   },
   a0O3b00000ffNzbEAE: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/Maison%20Margiela-main.a172327e11f40992d628.webp" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/Maison%20Margiela-main.a172327e11f40992d628.webp",
+    },
     tagLine: "SMELLS LIKE MEMORIES.",
-    desc: '<p class="seti">Maison Margiela is a Parisian haute couture house founded on ideas of nonconformity and the subversion of norms. Appointed Creative Director in 2014, the British couturier John Galliano exercises his visual language to expand on the grammar of Maison Margiela, creating a new technical vocabulary that cements the house’s position as a singular and autonomous entity in the realm of luxury.</p><p class="seti">In 1994, Maison Margiela introduced the first "REPLICA" fashion pieces: garments and accessories hand-picked throughout the world and meticulously reproduced, preserving their character and charm. Each piece features a special label inside, describing the source and period of the original item.</p><p class="seti">In 2012, Maison Margiela expanded on this unique concept with a collection of fragrances: the scents your memories are made of. The "REPLICA" collection assembles iconcolast fragrances that have the universal power to trigger personally cherished moments, personal stories lived or to be lived.</p>'
+    desc: '<p class="seti">Maison Margiela is a Parisian haute couture house founded on ideas of nonconformity and the subversion of norms. Appointed Creative Director in 2014, the British couturier John Galliano exercises his visual language to expand on the grammar of Maison Margiela, creating a new technical vocabulary that cements the house’s position as a singular and autonomous entity in the realm of luxury.</p><p class="seti">In 1994, Maison Margiela introduced the first "REPLICA" fashion pieces: garments and accessories hand-picked throughout the world and meticulously reproduced, preserving their character and charm. Each piece features a special label inside, describing the source and period of the original item.</p><p class="seti">In 2012, Maison Margiela expanded on this unique concept with a collection of fragrances: the scents your memories are made of. The "REPLICA" collection assembles iconcolast fragrances that have the universal power to trigger personally cherished moments, personal stories lived or to be lived.</p>',
   },
   a0O3b00000p4F4DEAU: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/estee-launder-main.49ed7ad83e9ca188b827.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/estee-launder-main.49ed7ad83e9ca188b827.png",
+    },
     tagLine: "CREATING THE FUTURE OF BEAUTY TOGETHER.",
-    desc: '<p class="seti">Estée Lauder is the flagship brand of The Estée Lauder Companies Inc. Founded by Estée Lauder, one of the world’s first female entrepreneurs, the brand today continues her legacy of creating the most innovative, sophisticated, high-performance skin care and makeup products and iconic fragrances — all infused with a deep understanding of women’s needs and desires. Today Estée Lauder engages with women in over 150 countries and territories around the world and at a variety of touch points, in stores and online. And each of these relationships consistently reflects Estée’s powerful and authentic woman-to-woman point of view.</p><p class="seti">In 1946, Mrs. Estée Lauder started with four cremes and a dream. With grit and persistence, she paved her own way in the beauty industry—going from selling her cremes in salons to selling them on the shelves of stores around the world.</p><p class="seti">At a time when the beauty industry was ruled by men, Estée was the original girl boss, breaking glass ceilings and defying expectations at every turn. She was a true influencer, connecting with and giving honest, real-world beauty advice to women around the world.</p><p class="seti">Her life’s passion was to make everyone look and feel their most beautiful, and it’s this same spirit and high-touch experience that we strive to bring to every customer today.</p>'
+    desc: '<p class="seti">Estée Lauder is the flagship brand of The Estée Lauder Companies Inc. Founded by Estée Lauder, one of the world’s first female entrepreneurs, the brand today continues her legacy of creating the most innovative, sophisticated, high-performance skin care and makeup products and iconic fragrances — all infused with a deep understanding of women’s needs and desires. Today Estée Lauder engages with women in over 150 countries and territories around the world and at a variety of touch points, in stores and online. And each of these relationships consistently reflects Estée’s powerful and authentic woman-to-woman point of view.</p><p class="seti">In 1946, Mrs. Estée Lauder started with four cremes and a dream. With grit and persistence, she paved her own way in the beauty industry—going from selling her cremes in salons to selling them on the shelves of stores around the world.</p><p class="seti">At a time when the beauty industry was ruled by men, Estée was the original girl boss, breaking glass ceilings and defying expectations at every turn. She was a true influencer, connecting with and giving honest, real-world beauty advice to women around the world.</p><p class="seti">Her life’s passion was to make everyone look and feel their most beautiful, and it’s this same spirit and high-touch experience that we strive to bring to every customer today.</p>',
   },
   a0O1O00000XYBvkUAH: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/kevy-auc-main.25b5d3519359b521f0ac.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/kevy-auc-main.25b5d3519359b521f0ac.png",
+    },
     tagLine: "BEAUTY BELONGS TO THE BRAVE",
-    desc: '<p class="seti">Kevyn Aucoin Beauty was founded in 2001 by one of the most iconic and influential makeup artists of all time. In the 90s, Kevyn became the first celebrity makeup artist with clients like Cindy Crawford, Naomi Campbell, Kate Moss, Cher, Whitney Houston, Madonna, Liza Minelli, Barbara Streisand, Tina Turner, and Jennifer Lopez. He perfected and brought fame to many iconic makeup techniques like contouring and the “J.Lo glow” leading him to become the first-ever makeup artist to receive a CFDA Award .</p><p class="seti">Kevyn tragically passed away in 2002, but not before launching his legacy brand– Kevyn Aucoin Beauty, where Kevyn’s spirit lives on today: It’s unapologetic, brave, and rather quite fearless.</p><p class="seti">Kevyn believed that every woman is beautiful within, and makeup was simply his tool for helping her discover that beauty. He was a man and an artist decades ahead of his time, which paved the way for innovative, award-winning products, high-performance formulas, and textures.</p><p class="seti">His luxurious textures and expansive shade ranges have had a broad appeal globally for 20 years, when most brands had a limited shade range. He was a true industry pioneer who championed inclusivity, originality, empowerment and education, which remain pillars of the brand today.</p>'
+    desc: '<p class="seti">Kevyn Aucoin Beauty was founded in 2001 by one of the most iconic and influential makeup artists of all time. In the 90s, Kevyn became the first celebrity makeup artist with clients like Cindy Crawford, Naomi Campbell, Kate Moss, Cher, Whitney Houston, Madonna, Liza Minelli, Barbara Streisand, Tina Turner, and Jennifer Lopez. He perfected and brought fame to many iconic makeup techniques like contouring and the “J.Lo glow” leading him to become the first-ever makeup artist to receive a CFDA Award .</p><p class="seti">Kevyn tragically passed away in 2002, but not before launching his legacy brand– Kevyn Aucoin Beauty, where Kevyn’s spirit lives on today: It’s unapologetic, brave, and rather quite fearless.</p><p class="seti">Kevyn believed that every woman is beautiful within, and makeup was simply his tool for helping her discover that beauty. He was a man and an artist decades ahead of his time, which paved the way for innovative, award-winning products, high-performance formulas, and textures.</p><p class="seti">His luxurious textures and expansive shade ranges have had a broad appeal globally for 20 years, when most brands had a limited shade range. He was a true industry pioneer who championed inclusivity, originality, empowerment and education, which remain pillars of the brand today.</p>',
   },
   a0O1O00000XYBvaUAH: {
-    img: { src: "https://beautyfashionsales.vercel.app/static/media/By-terry-main.c479f0be0d3cb5bb50c3.png" },
+    img: {
+      src: "https://beautyfashionsales.vercel.app/static/media/By-terry-main.c479f0be0d3cb5bb50c3.png",
+    },
     tagLine: "PARISIAN-BORN, SKINCARE-INFUSED MAKEUP.",
-    desc: '<p class="seti">Terry de Gunzburg is a trailblazing industry legend who over the course of the past 30 years has changed the face of beauty.</p><p class="seti">Trading a career in medicine for a more creative life, Terry studied at the Carita beauty school in Paris and quickly became an in-demand makeup artist working with some of the biggest names in fashion. Her trademark beauty look has always been distinctive: imperceptible foundation, impeccable lips and thick, separated lashes.</p><p class="seti">As International Makeup Designer of YSL Beauté for 15 years, Terry invented the iconic Touché Eclat in 1992 (as well as countless other products and formulas). Radiance and a healthy complexion has always been key to Terry’s approach to make up, and so she decided to launch her own collection of products in 1998, and BY TERRY was born.</p><p class="seti">In 2004 after a mix up in the lab, double the amount of rose butter was added to a lip balm which would soon become BY TERRY’s most successful product: Baume de Rose. Described as the Rolls Royce of lip balms, it symbolizes everything the brand stands for—luxury, indulgence and a timelessness.</p><p class="seti">Almost 10 years ago, before hyaluronic acid was widely known by households worldwide, Terry created the first clean mattifying setting powder, the Hyaluronic Hydra-Powder. This was the start of Terry’s one of a kind Hyaluronic Range. We remain today pioneers of this ingredient and its applications. </p>'
+    desc: '<p class="seti">Terry de Gunzburg is a trailblazing industry legend who over the course of the past 30 years has changed the face of beauty.</p><p class="seti">Trading a career in medicine for a more creative life, Terry studied at the Carita beauty school in Paris and quickly became an in-demand makeup artist working with some of the biggest names in fashion. Her trademark beauty look has always been distinctive: imperceptible foundation, impeccable lips and thick, separated lashes.</p><p class="seti">As International Makeup Designer of YSL Beauté for 15 years, Terry invented the iconic Touché Eclat in 1992 (as well as countless other products and formulas). Radiance and a healthy complexion has always been key to Terry’s approach to make up, and so she decided to launch her own collection of products in 1998, and BY TERRY was born.</p><p class="seti">In 2004 after a mix up in the lab, double the amount of rose butter was added to a lip balm which would soon become BY TERRY’s most successful product: Baume de Rose. Described as the Rolls Royce of lip balms, it symbolizes everything the brand stands for—luxury, indulgence and a timelessness.</p><p class="seti">Almost 10 years ago, before hyaluronic acid was widely known by households worldwide, Terry created the first clean mattifying setting powder, the Hyaluronic Hydra-Powder. This was the start of Terry’s one of a kind Hyaluronic Range. We remain today pioneers of this ingredient and its applications. </p>',
   },
 
   a0O3b00000p4F4CEAU: {
     img: {},
     tagLine: null,
-    desc: null
+    desc: null,
   },
   a0ORb0000000uwfMAA: {
     img: {},
     tagLine: null,
-    desc: null
+    desc: null,
   },
   a0O3b00000p4F4HEAU: {
     img: {},
     tagLine: null,
-    desc: null
+    desc: null,
   },
   a0ORb000000QzsfMAC: {
     img: {},
     tagLine: null,
-    desc: null
+    desc: null,
   },
   a0ORb000000nDfFMAU: {
     img: {},
     tagLine: null,
-    desc: null
+    desc: null,
   },
   a0ORb000000nDIiMAM: {
     img: {},
     tagLine: null,
-    desc: null
-  }
-}
+    desc: null,
+  },
+};
 
 export const productGuides = {
   productKey1: {
@@ -1122,7 +1300,6 @@ export const productGuides = {
     Type: "Video",
   },
   productKey2: {
-
     Categoryname: "Access",
     filename: "How To Access BFSG Retailer Portal.pdf",
     OriginalFileName: "how-to-access-bfsg-retailer-portal",
@@ -1255,11 +1432,8 @@ export const productGuides = {
     OriginalFileName: "how-to-place-preorders",
     Type: "pdf",
 
-
     // Direct link to the video file
   },
-
-
 };
 
 export function isDateEqualOrGreaterThanToday(dateString) {
@@ -1275,12 +1449,11 @@ export function isDateEqualOrGreaterThanToday(dateString) {
   return today >= inputDate;
 }
 
-
 export function DateConvert(dateString, timeStamp = false) {
   if (timeStamp) {
-    const options = { year: "numeric", month: "long", day: "numeric" }
-    dateString = new Date(dateString).toLocaleDateString(undefined, options)
-    return dateString
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    dateString = new Date(dateString).toLocaleDateString(undefined, options);
+    return dateString;
   }
   if (dateString) {
     const [year, month, day] = dateString.split(/[-/]/);
@@ -1288,7 +1461,10 @@ export function DateConvert(dateString, timeStamp = false) {
       let parsedDate = new Date(`${month}/${day}/${year}`);
       if (!isNaN(parsedDate.getTime())) {
         const options = { day: "numeric", month: "short", year: "numeric" };
-        let launchDateFormattedDate = new Intl.DateTimeFormat("en-US", options).format(new Date(parsedDate));
+        let launchDateFormattedDate = new Intl.DateTimeFormat(
+          "en-US",
+          options
+        ).format(new Date(parsedDate));
         return launchDateFormattedDate;
       }
     }

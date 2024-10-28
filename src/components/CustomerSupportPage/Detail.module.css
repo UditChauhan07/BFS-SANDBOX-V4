@@ -198,10 +198,17 @@
   font-size: 16px;
   font-style: normal;
   font-weight: 700;
-  line-height: 20px; /* 125% */
+  line-height: 20px; 
   letter-spacing: 1.12px;
 }
+.DownloadLink {
+  transition: text-decoration 0.2s !important; 
+}
 
+.DownloadLink:hover {
+  text-decoration: underline !important;  
+  cursor: pointer !important;
+}
 .RightMainDiv p {
   color: #000;
   font-family: Arial, Helvetica, sans-serif;
@@ -212,6 +219,7 @@
   letter-spacing: 1.12px;
   margin: 0 0 30px 0;
 }
+
 
 .ControlPriority p {
   display: flex;

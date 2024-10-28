@@ -7,7 +7,7 @@ let orderCartKey = "AA0KfX2OoNJvz7x"
 const CartContext = createContext();
 
 const initialOrder = {
-    ordertype: null, // Initially null, will be set on the first product addition
+    ordertype: null, 
     Account: {
         name: null,
         id: null,

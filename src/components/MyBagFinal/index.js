@@ -3,7 +3,15 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll } from "../../lib/store";
+import {
+  GetAuthData,
+  OrderPlaced,
+  POGenerator,
+  ShareDrive,
+  fetchBeg,
+  getSkKeys,
+  getProductImageAll,
+} from "../../lib/store";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
 import StylesModal from "../Modal UI/Styles.module.css";
@@ -12,10 +20,20 @@ import ProductDetails from "../../pages/productDetails";
 import Loading from "../Loading";
 import { useCart } from "../../context/CartContent";
 import { DeleteIcon } from "../../lib/svg";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { faAngleUp } from "@fortawesome/free-solid-svg-icons";
+import StripePay from "../../components/StripePay/StripePay";
 function MyBagFinal() {
   let Img1 = "/assets/images/dummy.png";
-  const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
+  const {
+    order,
+    updateProductQty,
+    removeProduct,
+    deleteOrder,
+    keyBasedUpdateCart,
+    getOrderTotal,
+  } = useCart();
   const navigate = useNavigate();
   const [total, setTotal] = useState(0);
   const [alert, setAlert] = useState(0);
@@ -23,18 +41,33 @@ function MyBagFinal() {
   const [PONumber, setPONumber] = useState();
   const [buttonActive, setButtonActive] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(0);
-  const [orderStatus, setorderStatus] = useState({ status: false, message: "" })
+  const [loading, setLoading] = useState(true);
+  const [manufacturerIds, setManufacturerIds] = useState([]);
+  const [proceeddiv, setproceeddiv] = useState(true);
+  const [orderStatus, setorderStatus] = useState({
+    status: false,
+    message: "",
+  });
   const [isPOEditable, setIsPOEditable] = useState(false);
   const [PONumberFilled, setPONumberFilled] = useState(true);
-  const [clearConfim, setClearConfim] = useState(false)
-  const [productDetailId, setProductDetailId] = useState(null)
+  const [clearConfim, setClearConfim] = useState(false);
+  const [productDetailId, setProductDetailId] = useState(null);
   const [confirm, setConfirm] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [iconVisible, setIconVisible] = useState(false);
+  const [isPaymentDetailsVisible, setisPAyment] = useState(false);
   // console.log({aa:Object.values(bagValue?.orderList)?.length});
   const [limitInput, setLimitInput] = useState(PONumber);
   const [isLoading, setIsLoading] = useState(true);
-  const [limitCheck, setLimitCheck] = useState(false)
-
+  const [limitCheck, setLimitCheck] = useState(false);
+  const [clientpaymentkey, setClientpaymentkey] = useState(null);
+  const [billingAddress, setBillingaddress] = useState(null);
+  const [billingPhone, setBillingphone] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState({
+    publishableKey: null,
+    secretKey: null,
+  });
+  console.log(isPaymentDetailsVisible,"ispaymentvisible")
   const fetchBag = fetchBeg({});
   const productLists = fetchBag?.items ?? [];
   const handleNameChange = (event) => {
@@ -43,18 +76,71 @@ function MyBagFinal() {
   };
 
   useEffect(() => {
-    setTotal(getOrderTotal())
-  }, [order])
-  
+    setTotal(getOrderTotal());
+  }, [order]);
+
+  useEffect(() => {
+    const fetchBagAndKeys = async () => {
+      setLoading(true);
+
+      try {
+        const ids = localStorage.getItem("ManufacturerId__c");
+        console.log(ids, "ids");
+        setManufacturerIds(ids);
+
+        if (ids.length > 0) {
+          const user = await GetAuthData();
+          console.log(user, "userabcccc");
+          const token = user.data.x_access_token;
+          console.log(token, "token");
+          const AccountId = localStorage.getItem("AccountId__c");
+          const response = await getSkKeys(ids, token, AccountId);
+          console.log(response, "response");
+          setPaymentDetails({
+            publishableKey: response.publishableKey,
+            secretKey: response.secretKey,
+          });
+          setClientpaymentkey(response.secretKey);
+          setBillingaddress(response.billingAddress);
+          setBillingphone(response.phoneNumber);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBagAndKeys();
+  }, []);
+
+  const handleProceedToPayClick = () => {
+    console.log("proceed to pay")
+    handleProceedToPay();
+    setproceeddiv(false);
+    setIconVisible(true);
+  };
+
+  const handleProceedToPay = () => {
+    console.log("proceed to pay")
+    setproceeddiv(false);
+    setisPAyment(true);
+    setIconVisible(true);
+  };
+
   useEffect(() => {
     const FetchPoNumber = async () => {
       try {
         const res = await POGenerator();
         if (res) {
-          let isPreOrder = productLists.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
+          let isPreOrder = productLists.some(
+            (product) =>
+              product.Category__c?.toUpperCase()?.includes("PREORDER") ||
+              product.Category__c?.toUpperCase()?.includes("EVENT")
+          );
           let poInit = res;
           if (isPreOrder) {
-            poInit = `PRE-${poInit}`
+            poInit = `PRE-${poInit}`;
           }
           keyBasedUpdateCart({ PoNumber: poInit });
           setPONumber(poInit);
@@ -64,22 +150,26 @@ function MyBagFinal() {
         console.error("Error fetching PO number:", error);
         setIsLoading(false);
       } finally {
-
       }
     };
 
     FetchPoNumber();
   }, []);
 
-
   useEffect(() => {
-
-    if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0) {
+    if (
+      order?.Account?.id &&
+      order?.Manufacturer?.id &&
+      order?.items?.length > 0
+    ) {
       setButtonActive(true);
     }
   }, []);
 
-  const [productImage, setProductImage] = useState({ isLoaded: false, images: {} });
+  const [productImage, setProductImage] = useState({
+    isLoaded: false,
+    images: {},
+  });
 
   useEffect(() => {
     let data = ShareDrive();
@@ -93,9 +183,12 @@ function MyBagFinal() {
             data[order?.Manufacturer?.id] = {};
           }
           if (Object.values(data[order.Manufacturer.id]).length > 0) {
-            setProductImage({ isLoaded: true, images: data[order.Manufacturer.id] })
+            setProductImage({
+              isLoaded: true,
+              images: data[order.Manufacturer.id],
+            });
           } else {
-            setProductImage({ isLoaded: false, images: {} })
+            setProductImage({ isLoaded: false, images: {} });
           }
         }
       }
@@ -103,38 +196,47 @@ function MyBagFinal() {
         if (order.items.length > 0) {
           let productCode = "";
           order.items.map((element, index) => {
-            productCode += `'${element.product?.ProductCode}'`
-            if (order.items.length - 1 != index) productCode += ', ';
-          })
-          getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
-            if (res) {
-              console.log({ res });
-              if (data[order.Manufacturer.id]) {
-                data[order.Manufacturer.id] = { ...data[order.Manufacturer.id], ...res }
+            productCode += `'${element.product?.ProductCode}'`;
+            if (order.items.length - 1 != index) productCode += ", ";
+          });
+          getProductImageAll({ rawData: { codes: productCode } })
+            .then((res) => {
+              if (res) {
+                console.log({ res });
+                if (data[order.Manufacturer.id]) {
+                  data[order.Manufacturer.id] = {
+                    ...data[order.Manufacturer.id],
+                    ...res,
+                  };
+                } else {
+                  data[order.Manufacturer.id] = res;
+                }
+                ShareDrive(data);
+                setProductImage({ isLoaded: true, images: res });
               } else {
-                data[order.Manufacturer.id] = res
+                setProductImage({ isLoaded: true, images: {} });
               }
-              ShareDrive(data)
-              setProductImage({ isLoaded: true, images: res });
-            } else {
-              setProductImage({ isLoaded: true, images: {} });
-            }
-          }).catch((err) => {
-            console.log({ err });
-          })
+            })
+            .catch((err) => {
+              console.log({ err });
+            });
         }
       }
     }
-    if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0 && total > 0) {
+    if (
+      order?.Account?.id &&
+      order?.Manufacturer?.id &&
+      order?.items?.length > 0 &&
+      total > 0
+    ) {
       setButtonActive(true);
     }
   }, [order]);
 
   const orderPlaceHandler = () => {
-
     if (order?.Account?.SalesRepId) {
       setIsOrderPlaced(1);
-      setIsDisabled(true)
+      setIsDisabled(true);
       GetAuthData()
         .then((user) => {
           // let bagValue = fetchBeg()
@@ -144,11 +246,14 @@ function MyBagFinal() {
             let orderType = "Wholesale Numbers";
             if (order.items.length) {
               order.items.map((product) => {
-
-                let productCategory = product?.Category__c?.toUpperCase()?.trim();
+                let productCategory =
+                  product?.Category__c?.toUpperCase()?.trim();
 
                 // Set orderType based on product category and prepend "PRE" to PONumber if "PREORDER"
-                if (productCategory?.toUpperCase()?.includes("PREORDER") || productCategory?.toUpperCase()?.match("EVENT")?.length > 0) {
+                if (
+                  productCategory?.toUpperCase()?.includes("PREORDER") ||
+                  productCategory?.toUpperCase()?.match("EVENT")?.length > 0
+                ) {
                   orderType = "Pre Order";
                 }
                 let temp = {
@@ -176,17 +281,20 @@ function MyBagFinal() {
               ShippingZip: order?.Account?.address?.postalCode,
               list,
               key: user.data.x_access_token,
-              shippingMethod: order.Account.shippingMethod
+              shippingMethod: order.Account.shippingMethod,
             };
             OrderPlaced({ order: begToOrder, cartId: order.id })
               .then((response) => {
                 if (response) {
                   if (response.length) {
-                    setIsDisabled(false)
+                    setIsDisabled(false);
                     setIsOrderPlaced(0);
-                    setorderStatus({ status: true, message: response[0].message });
+                    setorderStatus({
+                      status: true,
+                      message: response[0].message,
+                    });
                   } else {
-                    setIsDisabled(false)
+                    setIsDisabled(false);
                     let status = deleteOrder();
                     navigate("/order-list");
                     setIsOrderPlaced(2);
@@ -202,32 +310,32 @@ function MyBagFinal() {
           console.error({ error });
         });
     } else {
-      alert("no sales rep.")
+      alert("no sales rep.");
     }
   };
 
-
-
   const deleteBag = () => {
     // localStorage.removeItem("AA0KfX2OoNJvz7x")
-    deleteOrder().then((res)=>{
-      if(res){
-        window.location.reload();
-      }
-    }).catch(err=>console.error({err}))
-  }
+    deleteOrder()
+      .then((res) => {
+        if (res) {
+          window.location.reload();
+        }
+      })
+      .catch((err) => console.error({ err }));
+  };
   // console.log("fetch bag", fetchBag)
 
   const OrderQuantity = () => {
     const { getOrderQuantity } = useCart();
 
     return getOrderQuantity() || 0;
-  }
+  };
   if (isOrderPlaced === 1) return <OrderLoader />;
   return (
     <div className="mt-4">
       {isLoading ? (
-        <Loading height={'50vh'} /> // Display full-page loader while data is loading
+        <Loading height={"50vh"} /> // Display full-page loader while data is loading
       ) : (
         <section>
           {alert == 1 && (
@@ -237,10 +345,15 @@ function MyBagFinal() {
                 <>
                   <div style={{ maxWidth: "309px" }}>
                     <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
-                    <p className={` ${Styles.ModalContent}`}>Please Select Products of Minimum Order Amount</p>
+                    <p className={` ${Styles.ModalContent}`}>
+                      Please Select Products of Minimum Order Amount
+                    </p>
                     {/* <p className={` ${Styles.ModalContent}`}><b>Current Order Total:</b> ${formentAcmount(orderTotal)}</p> */}
                     <div className="d-flex justify-content-center">
-                      <button className={Styles.btnHolder} onClick={() => setAlert(0)}>
+                      <button
+                        className={Styles.btnHolder}
+                        onClick={() => setAlert(0)}
+                      >
                         OK
                       </button>
                     </div>
@@ -257,9 +370,14 @@ function MyBagFinal() {
                 <>
                   <div style={{ maxWidth: "309px" }}>
                     <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
-                    <p className={` ${Styles.ModalContent}`}>Please Select Tester Product of Minimum Order Amount</p>
+                    <p className={` ${Styles.ModalContent}`}>
+                      Please Select Tester Product of Minimum Order Amount
+                    </p>
                     <div className="d-flex justify-content-center">
-                      <button className={Styles.btnHolder} onClick={() => setAlert(0)}>
+                      <button
+                        className={Styles.btnHolder}
+                        onClick={() => setAlert(0)}
+                      >
                         OK
                       </button>
                     </div>
@@ -277,9 +395,14 @@ function MyBagFinal() {
               <>
                 <div style={{ maxWidth: "309px" }}>
                   <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
-                  <p className={` ${Styles.ModalContent}`}>Please upload file with less than 100 products</p>
+                  <p className={` ${Styles.ModalContent}`}>
+                    Please upload file with less than 100 products
+                  </p>
                   <div className="d-flex justify-content-center">
-                    <button className={StylesModal.modalButton} onClick={() => setLimitCheck(false)}>
+                    <button
+                      className={StylesModal.modalButton}
+                      onClick={() => setLimitCheck(false)}
+                    >
                       OK
                     </button>
                   </div>
@@ -292,17 +415,23 @@ function MyBagFinal() {
             open={confirm || false}
             content={
               <div className="d-flex flex-column gap-3">
-                <h2 style={{ textDecoration: 'underline' }}>
-                  Confirm
-                </h2>
+                <h2 style={{ textDecoration: "underline" }}>Confirm</h2>
                 <p>
-                  Are you sure you want to generate a order?<br /> This action cannot be undone.
+                  Are you sure you want to generate a order?
+                  <br /> This action cannot be undone.
                 </p>
                 <div className="d-flex justify-content-around ">
-                  <button className={Styles.btnHolder} onClick={orderPlaceHandler} disabled={isDisabled}>
+                  <button
+                    className={Styles.btnHolder}
+                    onClick={orderPlaceHandler}
+                    disabled={isDisabled}
+                  >
                     Submit
                   </button>
-                  <button className={Styles.btnHolder} onClick={() => setConfirm(false)}>
+                  <button
+                    className={Styles.btnHolder}
+                    onClick={() => setConfirm(false)}
+                  >
                     Cancel
                   </button>
                 </div>
@@ -322,10 +451,38 @@ function MyBagFinal() {
                     Are you Sure you want to clear bag?
                   </p>
                   <div className="d-flex justify-content-around ">
-                    <button style={{ backgroundColor: '#000', color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: '600', height: '30px', letterSpacing: '1.4px', lineHeight: 'normal', width: '100px' }} onClick={deleteBag}>
+                    <button
+                      style={{
+                        backgroundColor: "#000",
+                        color: "#fff",
+                        fontFamily: "Montserrat-600",
+                        fontSize: "14px",
+                        fontStyle: "normal",
+                        fontWeight: "600",
+                        height: "30px",
+                        letterSpacing: "1.4px",
+                        lineHeight: "normal",
+                        width: "100px",
+                      }}
+                      onClick={deleteBag}
+                    >
                       Yes
                     </button>
-                    <button style={{ backgroundColor: '#000', color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: '600', height: '30px', letterSpacing: '1.4px', lineHeight: 'normal', width: '100px' }} onClick={() => setClearConfim(false)}>
+                    <button
+                      style={{
+                        backgroundColor: "#000",
+                        color: "#fff",
+                        fontFamily: "Montserrat-600",
+                        fontSize: "14px",
+                        fontStyle: "normal",
+                        fontWeight: "600",
+                        height: "30px",
+                        letterSpacing: "1.4px",
+                        lineHeight: "normal",
+                        width: "100px",
+                      }}
+                      onClick={() => setClearConfim(false)}
+                    >
                       Cancel
                     </button>
                   </div>
@@ -340,18 +497,43 @@ function MyBagFinal() {
             <ModalPage
               open
               content={
-                <div className="d-flex flex-column gap-3" style={{ maxWidth: '700px' }}>
-                  <h2 className={`${Styles.warning} `}>Error while Generating order</h2>
-                  <p className={`${Styles.warningContent} `} style={{ lineHeight: '22px' }}>
-                    We apologize for inconvenience, But we are facing trouble placing your order.
+                <div
+                  className="d-flex flex-column gap-3"
+                  style={{ maxWidth: "700px" }}
+                >
+                  <h2 className={`${Styles.warning} `}>
+                    Error while Generating order
+                  </h2>
+                  <p
+                    className={`${Styles.warningContent} `}
+                    style={{ lineHeight: "22px" }}
+                  >
+                    We apologize for inconvenience, But we are facing trouble
+                    placing your order.
                     <br />
-                    <p style={{ fontSize: '14px' }}>Please contact your SalesRep or Portal Support.</p>
-                    <small>
-                      {orderStatus.message}
-                    </small>
+                    <p style={{ fontSize: "14px" }}>
+                      Please contact your SalesRep or Portal Support.
+                    </p>
+                    <small>{orderStatus.message}</small>
                   </p>
                   <div className="d-flex justify-content-around ">
-                    <button style={{ backgroundColor: '#000', color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: '600', height: '30px', letterSpacing: '1.4px', lineHeight: 'normal', width: '100px' }} onClick={() => setorderStatus({ status: false, message: "" })}>
+                    <button
+                      style={{
+                        backgroundColor: "#000",
+                        color: "#fff",
+                        fontFamily: "Montserrat-600",
+                        fontSize: "14px",
+                        fontStyle: "normal",
+                        fontWeight: "600",
+                        height: "30px",
+                        letterSpacing: "1.4px",
+                        lineHeight: "normal",
+                        width: "100px",
+                      }}
+                      onClick={() =>
+                        setorderStatus({ status: false, message: "" })
+                      }
+                    >
                       OK
                     </button>
                   </div>
@@ -367,7 +549,13 @@ function MyBagFinal() {
               <div className={Styles.MyBagFinalTop}>
                 <div className={Styles.MyBagFinalRight}>
                   <button onClick={() => navigate("/orders")}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="16"
+                      viewBox="0 0 24 16"
+                      fill="none"
+                    >
                       <path
                         d="M8.94284 2.27615C9.46349 1.75544 9.46349 0.911229 8.94284 0.390521C8.42213 -0.130174 7.57792 -0.130174 7.05721 0.390521L2.3911 5.05666C2.39092 5.05684 2.39128 5.05648 2.3911 5.05666L0.390558 7.05721C0.153385 7.29442 0.024252 7.59868 0.00313201 7.90895C-0.00281464 7.99562 -0.000321319 8.08295 0.010852 8.17002C0.0431986 8.42308 0.148118 8.66868 0.325638 8.87322C0.348651 8.89975 0.372651 8.92535 0.397585 8.94989L7.05721 15.6095C7.57792 16.1302 8.42213 16.1302 8.94284 15.6095C9.46349 15.0888 9.46349 14.2446 8.94284 13.7239L4.55231 9.33335H22.6667C23.4031 9.33335 24 8.73642 24 8.00002C24 7.26362 23.4031 6.66668 22.6667 6.66668H4.55231L8.94284 2.27615Z"
                         fill="black"
@@ -377,7 +565,23 @@ function MyBagFinal() {
                   <h4>
                     {buttonActive ? (
                       <>
-                        <span> <Link style={{color:'#000'}} to={`/Brand/${order?.Manufacturer?.id}`}>{order?.Manufacturer?.name}</Link> |</span>&nbsp;<Link style={{color:'#000'}} to={`/store/${order?.Account?.id}`}>{order?.Account?.name}</Link>
+                        <span>
+                          {" "}
+                          <Link
+                            style={{ color: "#000" }}
+                            to={`/Brand/${order?.Manufacturer?.id}`}
+                          >
+                            {order?.Manufacturer?.name}
+                          </Link>{" "}
+                          |
+                        </span>
+                        &nbsp;
+                        <Link
+                          style={{ color: "#000" }}
+                          to={`/store/${order?.Account?.id}`}
+                        >
+                          {order?.Account?.name}
+                        </Link>
                       </>
                     ) : (
                       <span>Empty bag</span>
@@ -390,12 +594,10 @@ function MyBagFinal() {
                     PO Number{" "}
                     {!isPOEditable ? (
                       <b>
-                        {buttonActive ? (
-                          // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
-                          PONumber
-                        ) : (
-                          "---"
-                        )}
+                        {buttonActive
+                          ? // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
+                            PONumber
+                          : "---"}
                       </b>
                     ) : (
                       <input
@@ -434,27 +636,34 @@ function MyBagFinal() {
                     </svg>
                   )}
                 </div>
-
               </div>
 
               <div className={Styles.MyBagFinalMain}>
                 <div className="row">
                   <div className="col-lg-7 col-md-8 col-sm-12">
                     <div className={Styles.MainBag}>
-                      <h3>SHOPPING BAG (<OrderQuantity />)</h3>
+                      <h3>
+                        SHOPPING BAG (<OrderQuantity />)
+                      </h3>
                       <div className={Styles.scrollP}>
-                        <div className={`${Styles.MainInner} overflow-auto`} style={{ minHeight: "400px" }}>
+                        <div
+                          className={`${Styles.MainInner} overflow-auto`}
+                          style={{ minHeight: "400px" }}
+                        >
                           {order && order.items?.length > 0 ? (
                             order.items?.map((ele) => {
-
                               let salesPrice = ele?.price;
                               let listPrice = Number().toFixed(2);
-                              if (salesPrice == 'NaN') {
+                              if (salesPrice == "NaN") {
                                 salesPrice = 0;
                               }
-                              listPrice = Number(ele?.usdRetail__c?.replace('$', '').replace(',', '')).toFixed(2);
+                              listPrice = Number(
+                                ele?.usdRetail__c
+                                  ?.replace("$", "")
+                                  .replace(",", "")
+                              ).toFixed(2);
                               if (ele?.usdRetail__c.includes("$")) {
-                                if (listPrice == 'NaN') {
+                                if (listPrice == "NaN") {
                                   listPrice = 0;
                                 }
                               }
@@ -462,29 +671,100 @@ function MyBagFinal() {
                               return (
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
-                                    <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
-                                      {
-                                        ele?.ContentDownloadUrl ? <img src={ele?.ContentDownloadUrl} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : ele?.ProductImage ? <img src={ele?.ProductImage} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : !productImage.isLoaded ? <LoaderV2 /> :
-                                          productImage.images?.[ele?.ProductCode] ?
-                                            productImage.images[ele?.ProductCode]?.ContentDownloadUrl ?
-                                              <img src={productImage.images[ele?.ProductCode]?.ContentDownloadUrl} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
-                                              : <img src={productImage.images[ele?.ProductCode]} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
-                                            : <img src={Img1} alt="img" onClick={() => { setProductDetailId(ele?.Id) }} />
-                                      }
+                                    <div
+                                      className={Styles.Mainbox2}
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      {ele?.ContentDownloadUrl ? (
+                                        <img
+                                          src={ele?.ContentDownloadUrl}
+                                          f
+                                          className="zoomInEffect"
+                                          alt="img"
+                                          width={50}
+                                          onClick={() => {
+                                            setProductDetailId(ele?.Id);
+                                          }}
+                                        />
+                                      ) : ele?.ProductImage ? (
+                                        <img
+                                          src={ele?.ProductImage}
+                                          f
+                                          className="zoomInEffect"
+                                          alt="img"
+                                          width={50}
+                                          onClick={() => {
+                                            setProductDetailId(ele?.Id);
+                                          }}
+                                        />
+                                      ) : !productImage.isLoaded ? (
+                                        <LoaderV2 />
+                                      ) : productImage.images?.[
+                                          ele?.ProductCode
+                                        ] ? (
+                                        productImage.images[ele?.ProductCode]
+                                          ?.ContentDownloadUrl ? (
+                                          <img
+                                            src={
+                                              productImage.images[
+                                                ele?.ProductCode
+                                              ]?.ContentDownloadUrl
+                                            }
+                                            alt="img"
+                                            width={25}
+                                            onClick={() => {
+                                              setProductDetailId(ele?.Id);
+                                            }}
+                                          />
+                                        ) : (
+                                          <img
+                                            src={
+                                              productImage.images[
+                                                ele?.ProductCode
+                                              ]
+                                            }
+                                            alt="img"
+                                            width={25}
+                                            onClick={() => {
+                                              setProductDetailId(ele?.Id);
+                                            }}
+                                          />
+                                        )
+                                      ) : (
+                                        <img
+                                          src={Img1}
+                                          alt="img"
+                                          onClick={() => {
+                                            setProductDetailId(ele?.Id);
+                                          }}
+                                        />
+                                      )}
                                     </div>
                                     <div className={Styles.Mainbox3}>
-                                      <h2 onClick={() => { setProductDetailId(ele?.Id) }} style={{ cursor: 'pointer' }}>{ele?.Name}</h2>
+                                      <h2
+                                        onClick={() => {
+                                          setProductDetailId(ele?.Id);
+                                        }}
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        {ele?.Name}
+                                      </h2>
                                       <p>
                                         <span className={Styles.Span1}>
                                           {`$${listPrice}`}
                                         </span>
-                                        <span className={Styles.Span2}>${Number(salesPrice).toFixed(2)}</span>
+                                        <span className={Styles.Span2}>
+                                          ${Number(salesPrice).toFixed(2)}
+                                        </span>
                                       </p>
                                     </div>
                                   </div>
 
                                   <div className={Styles.Mainbox2M}>
-                                    <div className={Styles.Mainbox4} onClick={() => removeProduct(ele.Id)}>
+                                    <div
+                                      className={Styles.Mainbox4}
+                                      onClick={() => removeProduct(ele.Id)}
+                                    >
                                       <DeleteIcon fill="red" />
                                     </div>
                                     <div className={Styles.Mainbox5}>
@@ -502,7 +782,10 @@ function MyBagFinal() {
                             })
                           ) : (
                             <>
-                              <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "35vh" }}>
+                              <div
+                                className="d-flex justify-content-center align-items-center"
+                                style={{ minHeight: "35vh" }}
+                              >
                                 No Products in Bag
                               </div>
                             </>
@@ -522,23 +805,84 @@ function MyBagFinal() {
 
                   <div className="col-lg-5 col-md-4 col-sm-12">
                     <div className={Styles.ShippControl}>
-                      <h2>Shipping Address</h2>
+                      <h2
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          border: "1px solid #ccc",
+                          padding: "10px",
+                        }}
+                      >
+                        Shipping Address{" "}
+                        {iconVisible && (
+                          <FontAwesomeIcon
+                            icon={proceeddiv ? faAngleUp : faAngleDown}
+                          />
+                        )}
+                      </h2>
 
-                      <div className={Styles.ShipAdress}>
-                        {buttonActive ? (
-                          <p>
-                            {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
-                            {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
-                            <br />
-                            {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
-                          </p>
-                        ) : (
-                          <p>No Shipping Address</p>
+                      <div className={Styles.Accordion}>
+                        {proceeddiv && (
+                          <>
+                            <div className={Styles.ShipAdress}>
+                              {buttonActive ? (
+                                <p>
+                                  <strong>Shipping Address:</strong>
+                                  <br />
+                                  {order?.Account?.address?.street},{" "}
+                                  {order?.Account?.address?.city} <br />
+                                  {order?.Account?.address?.state},{" "}
+                                  {order?.Account?.address?.country}{" "}
+                                  {order?.Account?.address?.postalCode}
+                                  <br />
+                                  {order?.Account?.address?.email}{" "}
+                                  {order?.Account?.address?.contact &&
+                                    `{ |  ${order?.Account?.address?.contact}}`}
+                                  <br />
+                                  <br />
+                                  {order?.Account?.address?.contact && (
+                                    <>
+                                  amount    <strong>Contact:</strong>{" "}
+                                      {order?.Account?.address?.contact}
+                                    </>
+                                  )}
+                                </p>
+                              ) : (
+                                <p>No Shipping Address</p>
+                              )}
+                            </div>
+
+                            <div className={Styles.ShipAdress2}>
+                              <label>NOTE</label>
+                              <textarea
+                                onKeyUp={(e) => {
+                                  keyBasedUpdateCart({ Note: e.target.value });
+                                }}
+                                placeholder="NOTE"
+                                className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px]"
+                              />
+                              {order?.Note}
+                            </div>
+                          </>
                         )}
                       </div>
 
-                      <div className={Styles.ShipAdress2}>
-                        <textarea onKeyUp={(e) => { keyBasedUpdateCart({ Note: e.target.value }) }} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">{order?.Note}</textarea>
+                      <div className={Styles.PaymentSection}>
+                        {isPaymentDetailsVisible && (
+                          <div className={Styles.Accordion}>
+                            <StripePay
+                              amount={Number(total).toFixed(2)}
+                              orderDes={orderDesc}
+                              PONumber={PONumber || limitInput}
+                              PK_KEY={paymentDetails.publishableKey}
+                              SK_KEY={clientpaymentkey}
+                              billingAddress={billingAddress}
+                              billingPhone={billingPhone}
+                            />
+                          </div>
+                        )}
                       </div>
                       {!PONumberFilled ? (
                         <ModalPage
@@ -546,8 +890,15 @@ function MyBagFinal() {
                           content={
                             <>
                               <div style={{ maxWidth: "309px" }}>
-                                <h1 className={`fs-5 ${StylesModal.ModalHeader}`}>Warning</h1>
-                                <p className={` ${StylesModal.ModalContent}`}> Please Enter PO Number</p>
+                                <h1
+                                  className={`fs-5 ${StylesModal.ModalHeader}`}
+                                >
+                                  Warning
+                                </h1>
+                                <p className={` ${StylesModal.ModalContent}`}>
+                                  {" "}
+                                  Please Enter PO Number
+                                </p>
                                 <div className="d-flex justify-content-center">
                                   <button
                                     className={`${StylesModal.modalButton}`}
@@ -567,42 +918,59 @@ function MyBagFinal() {
                         />
                       ) : null}
                       <div className={Styles.ShipBut}>
-                        <button
-                          onClick={() => {
-                            if (order?.items?.length) {
-                              if (PONumber.length) {
-                                if (order?.items?.length > 100) {
-                                  setLimitCheck(true)
-                                } else {
-                                  if (order.Account.discount.MinOrderAmount > total) {
-                                    setAlert(1);
+                        {paymentDetails.publishableKey &&
+                        paymentDetails.secretKey ? (
+                          !isPaymentDetailsVisible ? (
+                            <button
+                              onClick={handleProceedToPayClick}
+                              disabled={!buttonActive}
+                            >
+                              ${Number(total).toFixed(2)} PROCEED TO PAY
+                            </button>
+                          ) : null
+                        ) : (
+                          <button
+                            onClick={() => {
+                              if (order?.items?.length) {
+                                if (PONumber.length) {
+                                  if (order?.items?.length > 100) {
+                                    setLimitCheck(true);
                                   } else {
-                                    // if (testerInBag && order.Account.discount.testerproductLimit > total) {
-                                    //   setAlert(2);
-                                    // } else {
-                                    setConfirm(true);
-                                    // }
+                                    if (
+                                      order.Account.discount.MinOrderAmount >
+                                      total
+                                    ) {
+                                      setAlert(1);
+                                    } else {
+                                      // Uncomment the line below if needed
+                                      // if (testerInBag && order.Account.discount.testerproductLimit > total) {
+                                      //   setAlert(2);
+                                      // } else {
+                                      setConfirm(true);
+                                      // }
+                                    }
                                   }
+                                } else {
+                                  setPONumberFilled(false);
                                 }
-                              } else {
-                                setPONumberFilled(false);
-
                               }
-                            }
+                            }}
+                            disabled={!buttonActive}
+                          >
+                            ${Number(total).toFixed(2)} PLACE ORDER
+                          </button>
+                        )}
+
+                        <p
+                          className={`${Styles.ClearBag}`}
+                          style={{ textAlign: "center", cursor: "pointer", marginTop:"10px" }}
+                          onClick={() => {
+                            setClearConfim(true);
                           }}
                           disabled={!buttonActive}
                         >
-                          ${Number(total).toFixed(2)} PLACE ORDER
-                        </button>
-                        <p className={`${Styles.ClearBag}`} style={{ textAlign: 'center', cursor: 'pointer' }}
-                          onClick={() => {
-
-                            setClearConfim(true)
-                          }
-                          }
-                          disabled={!buttonActive}
-                        >Clear Bag</p>
-                        {/* {Number(total) ? null : window.location.reload()} */}
+                          Clear Bag
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -612,7 +980,11 @@ function MyBagFinal() {
           </div>
         </section>
       )}
-      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={[order?.Account?.id]} />
+      <ProductDetails
+        productId={productDetailId}
+        setProductDetailId={setProductDetailId}
+        AccountId={[order?.Account?.id]}
+      />
     </div>
   );
 }

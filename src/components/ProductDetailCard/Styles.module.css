@@ -66,10 +66,6 @@
   letter-spacing: 1.12px!important;
   text-align: start!important;
 }
-.priceHolder a {
-  color: #000;
-  text-decoration: none;
-}
 .brandHolder{
   color: #000;
   font-family: "Arial-500"!important;
@@ -86,4 +82,38 @@
   line-height: 32px!important;
   letter-spacing: 1.12px!important;
   text-align: start!important;
+}
+@media (max-width: 768px) {
+  .product-card-element {
+    flex-direction: column; /* Stack items on small screens */
+    align-items: center; /* Center items */
+  }
+
+  .productimage {
+    flex: none; /* Reset flex property for images */
+    width: 100%; /* Full width on small screens */
+    max-width: 100%; /* Ensure no overflow */
+  }
+
+  .product-card-element-holder {
+    width: 100%; /* Full width on small screens */
+    padding: 0 15px; /* Add some padding */
+  }
+
+  .nameHolder {
+    font-size: 24px; /* Reduce font size */
+  }
+
+  .priceHolder {
+    font-size: 20px; /* Reduce font size */
+  }
+
+  .descHolder {
+    font-size: 16px; /* Adjust description font size */
+  }
+
+  .button {
+    width: 100%; /* Full width for buttons */
+    padding: 10px; /* Add padding for better touch targets */
+  }
 }

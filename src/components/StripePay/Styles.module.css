@@ -1,0 +1,246 @@
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .inputField {
+    width: 100%; /* Full width for card number */
+    margin: 0.5rem 0;
+  }
+  
+  .flexRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Add some space between the two fields */
+  }
+  .flexRow div{
+    margin: 0.5rem 0;
+  }
+  .halfWidth {
+    width: 50%; /* Expiry and CVC elements will take 50% width each */
+  }
+  
+  .btnHolder {
+    margin-top: 20px;
+  }
+  
+  .btn {
+    text-align: center;
+    color: #fff;
+    width: 100%;
+    font-family: "Montserrat";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: #000;
+    margin: 0 0 28px 0;
+  }
+  
+  .btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .Accordion {
+    background-color: #f9f9f9;
+    /* border: 1px solid #ddd; */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 1em 0;
+    padding: 1em;
+  }
+  
+  .Header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .Header:hover {
+    background-color: #0056b3;
+  }
+  
+  h2 {
+    margin: 0;
+    font-size: 1.25em;
+    flex: 1;
+  }
+  
+  .ArrowDown,
+  .ArrowRight {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    transition: transform 0.3s;
+  }
+  
+  .ArrowDown {
+    border-top: 5px solid white;
+    transform: rotate(180deg);
+  }
+  
+  .ArrowRight {
+    border-top: 5px solid white;
+  }
+  
+  .StripePaymentForm {
+    /* background-color: white;
+    padding: 2em; */
+    /* border-radius: 8px; */
+    background: #fff;;
+    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); */
+    margin-top: 1em;
+  }
+  
+  .StripePaymentForm input {
+    width: 100%;
+    padding: 10px;
+    margin: 0.5em 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .ShipBut {
+    width: 100%;
+  }
+  .ShipBut button{
+    width: 100%;
+  }
+  .ShipBut1{
+    height: 50px !important;
+    margin-top: 21px !important;
+  }
+  .paybtn{
+    background-color: #f1f0f0;
+    width: 100%;
+    color:black;
+    text-align: center;
+    font-family: "Montserrat";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 15px; 
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+  .paymentmaindiv{
+    border: 1px solid #e4e4e4 !important;
+    background: #fff !important;
+    padding: 15px !important;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .formGroup {
+    margin-bottom: 20px;
+  }
+  
+  .inlineFields {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .inlineFields .expiry,
+  .inlineFields .cvc {
+    width: 48%; 
+  }
+  
+  .CardElement {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .paybtn {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .errorMessage {
+    color: red;
+    margin-top: 10px;
+  }
+  .paymenthead {
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 1.2em; 
+  }
+  
+  .paymentmaindiv {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .formGroup label {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .formGroup input {
+    font-family: 'Montserrat', sans-serif; 
+  }
+  
+  .errorMessage {
+    font-family: 'Montserrat', sans-serif; 
+  }
+  
+  .paybtn {
+    font-family: 'Montserrat', sans-serif; 
+  }
+  
+  .paymenthead {
+      color: #000;
+      font-family: "Montserrat-500" !important;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 32px; 
+      letter-spacing: 1.12px;
+      text-transform: uppercase;
+    }
+
+  
+
+  .ShipBut button,.btnHolder {
+    color: #fff;
+    text-align: center;
+    font-family: "Montserrat";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: #000;
+    margin: 0 0 28px 0;
+  }
+  .StripePaymentForm button {
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .StripePaymentForm button:hover {
+    /* background-color: ; */
+  }
+  
+  

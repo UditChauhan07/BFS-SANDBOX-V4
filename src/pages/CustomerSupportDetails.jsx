@@ -1,45 +1,85 @@
 import { useSearchParams } from "react-router-dom";
 import FullQuearyDetail from "../components/CustomerSupportPage/FullQuearyDetail";
-import Layout from "../components/Layout/Layout";
+import AppLayout from "../components/AppLayout";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { GetAuthData, getSupportDetails } from "../lib/store";
-import Loading from "../components/Loading";
-import AppLayout from "../components/AppLayout";
+import { GetAuthData, getSupportDetails, getAttachment } from "../lib/store";
 import LoaderV3 from "../components/loader/v3";
+import { useLocation } from "react-router";
 
 const CustomerSupportDetails = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [deatilsId, setDetailsId] = useState(searchParams.get("id"));
+  const [searchParams] = useSearchParams();
   const [detailsData, setDetailsData] = useState({});
+  const [attachmentUrls, setAttachmentUrls] = useState([]);
   const [isLoaded, setLoaded] = useState(false);
-  const [reset,setRest] = useState(false);
+  const [isLoadingAttachments, setLoadingAttachments] = useState(false); 
+  const location = useLocation();
+  const { id: detailsId } = location.state || {};
+
+
   useEffect(() => {
-    GetAuthData()
-      .then((user) => {
-        let rawData = { key: user?.data?.x_access_token, caseId: deatilsId };
-        getSupportDetails({ rawData })
-          .then((deatils) => {
-            deatils.salesRepName = user.Name;
-            setDetailsData(deatils);
-            setLoaded(true);
-            setRest(false)
-          })
-          .catch((err) => {
-            console.error({ err });
-          });
-      })
-      .catch((error) => {
-        console.error({ error });
-      });
-  }, [deatilsId,reset]);
-  if (!deatilsId || deatilsId == "") return navigate("/customer-support");
-  if (!isLoaded) return <AppLayout><LoaderV3 text={"Loading Support Details"}/></AppLayout>;
+  const fetchData = async () => {
+    try {
+      const user = await GetAuthData();
+      let rawData = { key: user?.data?.x_access_token, caseId: detailsId };
+      
+      const details = await getSupportDetails({ rawData });
+      details.salesRepName = user.Name;
+      setDetailsData(details);
+      
+      // Fetch attachments immediately after setting detailsData
+      await fetchAttachments(user.data.x_access_token, detailsId);
+      setLoaded(true);
+    } catch (error) {
+      console.error("Error fetching support details:", error);
+    }
+  };
+  fetchData();
+}, [detailsId, navigate]);
+
+const fetchAttachments = async (token, caseId) => {
+  if (!token || !caseId) return;
+  setLoadingAttachments(true);
+  
+  try {
+    const response = await getAttachment(token, caseId);
+    if (response && response.attachments) {
+      const formattedAttachments = response.attachments.map((attachment) => ({
+        id: attachment.id,
+        formattedId: `${attachment.id}.${attachment.name.split('.').pop().toLowerCase()}`,
+        name: attachment.name,
+      }));
+      setAttachmentUrls(formattedAttachments);
+    } else {
+      console.warn("No attachments found in response");
+      setAttachmentUrls([]);
+    }
+  } catch (error) {
+    console.error("Error fetching attachments:", error);
+  } finally {
+    setLoadingAttachments(false);
+  }
+};
+
+useEffect(() => {
+  if (detailsData?.user?.data?.x_access_token && detailsId) {
+    fetchAttachments(detailsData.user.data.x_access_token, detailsId);
+  }
+}, [detailsData, detailsId]);
+
+
+  if (!isLoaded) return <AppLayout><LoaderV3 text={"Loading Support Details"} /></AppLayout>;
+
   return (
     <AppLayout>
-      <FullQuearyDetail data={detailsData} setRest={setRest}/>
+      {isLoadingAttachments ? (
+        <LoaderV3 text={"Loading Attachments..."} />
+      ) : (
+        <FullQuearyDetail data={detailsData}  attachmentUrls={attachmentUrls} />
+      )}
     </AppLayout>
   );
 };
+
 export default CustomerSupportDetails;
