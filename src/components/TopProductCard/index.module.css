@@ -160,7 +160,6 @@
   display: grid;
   place-content: center;
 }
-
 .modalButton {
   color: #fff;
   font-family: Montserrat-600;
@@ -187,7 +186,11 @@
   content: "";
   width: 50%;
   height: 100%;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(240, 240, 240, 0.3) 100%);
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(240, 240, 240, 0.3) 100%
+  );
   transform: skewX(-25deg);
   animation: shine 0.75s;
 }
@@ -213,6 +216,15 @@
   .dGrid {
     grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
   }
+  .titleHolder {
+    font-size: 12px;
+  }
+  .priceFor{
+    padding-left: 9px;
+  }
+  .brandHolder {
+    font-size: 15px;
+  }
 
   .imgHolder {
     width: 100%;
@@ -223,4 +235,9 @@
     width: 100%;
     margin: 10px 0;
   }
+}
+@media (max-width:360px){
+.priceFor{
+  padding-left: 1px;
+}
 }

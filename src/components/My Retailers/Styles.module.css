@@ -1,8 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
 
-
-
-
 .Retailer {
   text-decoration: none;
   height: 100%;
@@ -19,9 +16,8 @@
 
 .mainRetailer h2 {
   color: #000;
-  font-family: "Montserrat-700";
+  font-family: "Montserrat", sans-serif;
   font-size: 16px;
-  font-style: normal;
   letter-spacing: 1.9px;
 }
 
@@ -31,8 +27,6 @@
   height: 100%;
   min-height: 40px;
   border: 1px solid #e1e1e1;
-  position: relative;
-  overflow: hidden;
   display: flex;
   align-items: center;
   margin: auto;
@@ -40,8 +34,8 @@
 
 .ControlerImg {
   left: 10px;
-  width: 16.198px;
-  height: 24.062px;
+  width: 16px;
+  height: 24px;
   flex-shrink: 0;
 }
 
@@ -49,7 +43,6 @@
   color: #000;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
-  font-style: normal;
   font-weight: 500;
   line-height: 32px;
   letter-spacing: 1.12px;
@@ -59,128 +52,134 @@
 .BrandName {
   cursor: pointer;
 }
+
 .Brandspan {
   margin: 10px 0 0px 0;
-}
-
-.Brandspan span {
-  border-radius: 3px;
-  background: #ecfbff;
-  color: #000;
-  font-family: Arial-400;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 1.12px;
-  padding: 3px 5px;
-}
-
-.Brandspan {
   gap: 10px;
   display: flex;
   flex-wrap: wrap;
   height: 59px;
   overflow: auto;
 }
-.KevynAucoinCosmeticsBg {
-  background-color: #ecfbff  !important;
+
+.Brandspan span {
+  border-radius: 3px;
+  background: #ecfbff;
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 1.12px;
+  padding: 3px 5px;
 }
 
-.BYTERRYBg {
-  background-color: #eaffee  !important;
-}
-
-.BobbiBrownBg {
-  background-color: #ffdcdc  !important;
-}
-
-.BumbleandBumbleBg {
-  background-color: #ffead7  !important;
-}
-
-.ReViveBg {
-  background-color: #f0f6ff  !important;
-}
-
-.RMSBeautyBg{
-background-color: #fffac9 !important;
-}
-.MaisonMargielaBg {
-  background-color: #f0f6ff  !important;
-}
-
-.SmashboxBg {
-  background-color: #eaffee  !important;
-}
-.esteeLauderBg {
-  background-color: #ead7ff  !important;
-}
-
-.Brandspan::-webkit-scrollbar {
-  /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3); */
-  border-radius: 50px;
-  background-color: #d9d9d9;
-  width: 3px;
-}
 .btn {
   text-decoration: none;
   position: relative;
   z-index: 20;
   transition: all 0.35s cubic-bezier(1, 0, 0, 1);
 }
+
 .btn:hover {
   color: #fcfcfc;
 }
-.btnColor::before, .btnColor::after {
-  background: #000;
-}
+
 .btn::before,
 .btn::after {
   content: '';
   position: absolute;
   z-index: -1;
-  transition: all 0.35s cubic-bezier(1.000, 0.000, 0.000, 1.000); 
+  transition: all 0.35s cubic-bezier(1.000, 0.000, 0.000, 1.000);
 }
+
 .btnFillLTR::after {
   height: 100%;
   width: 0;
   top: 0;
 }
-.btnFillLTR:hover::after .orderNow{
+
+.btnFillLTR:hover::after .orderNow {
   display: block;
 }
-.btnFillLTR:hover::after .brand{
+
+.btnFillLTR:hover::after .brand {
   display: none;
 }
-.orderNow{
+
+.orderNow {
   display: none;
 }
-.brand{
+
+.brand {
   display: block;
 }
- 
-.btnFillLTR:hover::after { 
-  width: 100%; 
+
+.btnFillLTR:hover::after {
+  width: 100%;
 }
-.btnFillLTR::after {
-  left: 0;
+
+.Brandspan::-webkit-scrollbar {
+  border-radius: 50px;
+  background-color: #d9d9d9;
+  width: 3px;
 }
 
 .Brandspan::-webkit-scrollbar-thumb {
   border-radius: 50px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   background-color: #000000;
   width: 3px;
-  position: relative;
 }
 
-@media (max-width: 1399.98px) {
+@media (max-width: 1200px) {
   .mainRetailer {
     padding: 15px;
   }
 
   .mainRetailer h2 {
-    font-size: 13px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .mainRetailer {
+    padding: 10px;
+  }
+
+  .mainRetailer h2 {
+    font-size: 12px;
+  }
+
+  .ControlerImg p {
+    font-size: 12px;
+    line-height: 24px;
+  }
+
+  .Brandspan span {
+    font-size: 11px; /* Adjust for smaller screens */
+    padding: 2px 4px; /* Smaller padding */
+  }
+}
+
+@media (max-width: 600px) {
+  .mainRetailer {
+    padding: 8px;
+  }
+
+  .mainRetailer h2 {
+    font-size: 10px; /* Further adjust font size */
+  }
+
+  .ControlerImg p {
+    font-size: 10px; /* Further adjust font size */
+    line-height: 20px; /* Adjust line height */
+  }
+
+  .Brandspan span {
+    font-size: 10px; /* Further adjust font size */
+  }
+
+  .RetailerImg {
+    min-height: 30px; /* Adjust for smaller screens */
   }
 }

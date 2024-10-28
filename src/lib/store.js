@@ -1,6 +1,9 @@
-export const originAPi = process.env.REACT_APP_OA_URL || "https://temp.beautyfashionsales.com"
+// export const originAPi = process.env.REACT_APP_OA_URL || "https://temp.beautyfashionsales.com"
+
+import axios from "axios";
+
 // export const originAPi = "https://dev.beautyfashionsales.com"
-// export const originAPi = "http://localhost:2611";
+export const originAPi = "http://localhost:2611";
 let url = `${originAPi}/retailer/`;
 let url2 = `${originAPi}/retailerv2/`;
 const orderKey = "orders";
@@ -133,19 +136,17 @@ export async function DownloadAttachment(token, attachmentId) {
 //   }
 // }
 
-
 export async function getAttachment(token, caseId) {
   try {
     console.log(token, caseId, "rawData");
-    const response = await fetch(originAPi + "/getAttachment/getAttachment", {
-      method: "POST",
-      body: JSON.stringify({ caseId }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
+    const response = await axios.post(
+      originAPi + "/getAttachment/getAttachment",
+      {
+        caseId: caseId,
+        key: token,
+      }
+    );
+    const data = response.data;
     console.log(data, "backend attachment");
     if (data.status === 300) {
       DestoryAuth();
@@ -204,19 +205,19 @@ export async function POGenerator() {
     return null;
   }
 }
-export const getSkKeys = async (manufacturerId,token,AccountId) => {
-  console.log(manufacturerId,token,AccountId,"backend response data")
+export const getSkKeys = async (manufacturerId, token, AccountId) => {
+  console.log(manufacturerId, token, AccountId, "backend response data");
   try {
     const response = await fetch(`${originAPi}/getKeys/getKeys`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-       'Authorization': `Bearer ${token}`
-        },
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
-        manufacturerId: manufacturerId ,
-        AccountId:AccountId
-      })
+        manufacturerId: manufacturerId,
+        AccountId: AccountId,
+      }),
     });
 
     if (!response) {
@@ -224,14 +225,13 @@ export const getSkKeys = async (manufacturerId,token,AccountId) => {
     }
 
     const data = await response.json();
-    console.log(data,"backend data")
-    return data; 
+    console.log(data, "backend data");
+    return data;
   } catch (error) {
     console.error("Error fetching keys:", error);
-    throw error; 
+    throw error;
   }
 };
-
 
 // Helper function to generate codes
 export function getStrCode(str) {

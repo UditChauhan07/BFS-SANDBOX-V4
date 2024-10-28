@@ -448,7 +448,7 @@ const CartProvider = ({ children }) => {
             const res = await cartSync({ cart: order });
 
             if (res) {
-                setOrder(initialOrder); // Only reset if deletion was successful
+                setOrder(initialOrder); 
                 return true;
             }
         } catch (err) {

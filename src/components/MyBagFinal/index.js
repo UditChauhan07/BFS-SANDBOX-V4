@@ -88,7 +88,7 @@ function MyBagFinal() {
         console.log(ids, "ids");
         setManufacturerIds(ids);
 
-        if (ids.length > 0) {
+        if (ids?.length > 0) {
           const user = await GetAuthData();
           console.log(user, "userabcccc");
           const token = user.data.x_access_token;
@@ -113,18 +113,18 @@ function MyBagFinal() {
 
     fetchBagAndKeys();
   }, []);
-
-  const handleProceedToPayClick = () => {
-    console.log("proceed to pay")
-    handleProceedToPay();
-    setproceeddiv(false);
-    setIconVisible(true);
-  };
-
   const handleProceedToPay = () => {
     console.log("proceed to pay")
     setproceeddiv(false);
     setisPAyment(true);
+    setIconVisible(true);
+  };
+  const handleProceedToPayClick = () => {
+    console.log("Proceed to pay clicked");
+    console.log("Button active:", buttonActive);
+    console.log("Total amount:", total);
+    handleProceedToPay();
+    setproceeddiv(false);
     setIconVisible(true);
   };
 
@@ -182,7 +182,7 @@ function MyBagFinal() {
           if (!data[order?.Manufacturer?.id]) {
             data[order?.Manufacturer?.id] = {};
           }
-          if (Object.values(data[order.Manufacturer.id]).length > 0) {
+          if (Object.values(data[order.Manufacturer.id])?.length > 0) {
             setProductImage({
               isLoaded: true,
               images: data[order.Manufacturer.id],
@@ -193,11 +193,11 @@ function MyBagFinal() {
         }
       }
       if (order.items) {
-        if (order.items.length > 0) {
+        if (order?.items?.length > 0) {
           let productCode = "";
           order.items.map((element, index) => {
             productCode += `'${element.product?.ProductCode}'`;
-            if (order.items.length - 1 != index) productCode += ", ";
+            if (order?.items?.length - 1 != index) productCode += ", ";
           });
           getProductImageAll({ rawData: { codes: productCode } })
             .then((res) => {
@@ -244,7 +244,7 @@ function MyBagFinal() {
             // setButtonActive(true)
             let list = [];
             let orderType = "Wholesale Numbers";
-            if (order.items.length) {
+            if (order?.items?.length) {
               order.items.map((product) => {
                 let productCategory =
                   product?.Category__c?.toUpperCase()?.trim();
@@ -286,7 +286,7 @@ function MyBagFinal() {
             OrderPlaced({ order: begToOrder, cartId: order.id })
               .then((response) => {
                 if (response) {
-                  if (response.length) {
+                  if (response?.length) {
                     setIsDisabled(false);
                     setIsOrderPlaced(0);
                     setorderStatus({
@@ -650,7 +650,7 @@ function MyBagFinal() {
                           className={`${Styles.MainInner} overflow-auto`}
                           style={{ minHeight: "400px" }}
                         >
-                          {order && order.items?.length > 0 ? (
+                          {order && order?.items?.length > 0 ? (
                             order.items?.map((ele) => {
                               let salesPrice = ele?.price;
                               let listPrice = Number().toFixed(2);
@@ -923,7 +923,7 @@ function MyBagFinal() {
                           !isPaymentDetailsVisible ? (
                             <button
                               onClick={handleProceedToPayClick}
-                              disabled={!buttonActive}
+                              // disabled={!buttonActive}
                             >
                               ${Number(total).toFixed(2)} PROCEED TO PAY
                             </button>
@@ -932,7 +932,7 @@ function MyBagFinal() {
                           <button
                             onClick={() => {
                               if (order?.items?.length) {
-                                if (PONumber.length) {
+                                if (PONumber?.length) {
                                   if (order?.items?.length > 100) {
                                     setLimitCheck(true);
                                   } else {
@@ -955,7 +955,7 @@ function MyBagFinal() {
                                 }
                               }
                             }}
-                            disabled={!buttonActive}
+                            // disabled={!buttonActive}
                           >
                             ${Number(total).toFixed(2)} PLACE ORDER
                           </button>

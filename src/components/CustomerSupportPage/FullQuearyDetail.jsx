@@ -414,7 +414,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls }) {
                     attachmentUrls.map((attachment, index) => (
                       <li key={index}>
                         <a
-                          style={{ color: "black", textDecoration: "none",fontSize:"12px" }}
+                          style={{ color: "black", textDecoration: "none",fontSize:"14px" }}
                           className={Detail.DownloadLink}
                           onClick={() =>
                             downloadFile(attachment.id, attachment.name)
@@ -425,7 +425,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls }) {
                       </li>
                     ))
                   ) : (
-                    <li><ContentLoader/></li>
+                    <li>No Attachment Found</li>
                   )}
                 </ul>
               </div>

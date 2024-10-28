@@ -266,7 +266,7 @@ const CheckoutForm = ({ clientSecret, amount, userName,billingAddress,billingPho
             "success"
           );
           localStorage.removeItem("clientSecret");
-          let status = deleteOrder();
+          const deleteSuccess = await deleteOrder();
           navigate("/order-list");
           break;
         case "processing":

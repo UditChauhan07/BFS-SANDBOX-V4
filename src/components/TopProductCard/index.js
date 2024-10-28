@@ -308,7 +308,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails = {}, a
                   {product?.Name.substring(0, 20)}...
                 </p>
                 {product?.Category__c === "PREORDER" && <small className={Styles.preOrderBadge}>Pre-Order</small>}
-                {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> :ProductInCart?<small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
+                {selAccount?.Name ? <small className={Styles.priceFor}>Price for <b className={Styles.pricebold}>{selAccount.Name}</b></small> :ProductInCart?<small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
                 <p className={Styles.priceHolder}>
                   <div>
                     {salesPrice != listPrice ? <p className={Styles.priceCrossed}>${listPrice.toFixed(2)}</p>:ProductInCart?<p className={Styles.priceCrossed}>${listPrice.toFixed(2)}</p>:null}
