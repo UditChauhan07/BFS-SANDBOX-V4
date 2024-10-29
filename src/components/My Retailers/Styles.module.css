@@ -131,6 +131,7 @@
   width: 3px;
 }
 
+/* Responsive styles */
 @media (max-width: 1200px) {
   .mainRetailer {
     padding: 15px;
@@ -156,8 +157,8 @@
   }
 
   .Brandspan span {
-    font-size: 11px; /* Adjust for smaller screens */
-    padding: 2px 4px; /* Smaller padding */
+    font-size: 11px;
+    padding: 2px 4px;
   }
 }
 
@@ -167,19 +168,48 @@
   }
 
   .mainRetailer h2 {
-    font-size: 10px; /* Further adjust font size */
+    font-size: 10px;
   }
 
   .ControlerImg p {
-    font-size: 10px; /* Further adjust font size */
-    line-height: 20px; /* Adjust line height */
+    font-size: 10px;
+    line-height: 20px;
   }
 
   .Brandspan span {
-    font-size: 10px; /* Further adjust font size */
+    font-size: 10px;
   }
 
   .RetailerImg {
-    min-height: 30px; /* Adjust for smaller screens */
+    min-height: 30px;
+  }
+}
+
+/* New media query for very small devices */
+@media (max-width: 400px) {
+  .mainRetailer {
+    padding: 6px;
+  }
+
+  .mainRetailer h2 {
+    font-size: 8px;
+  }
+
+  .ControlerImg p {
+    font-size: 8px;
+    line-height: 16px;
+  }
+
+  .Brandspan {
+    height: auto; /* Allow height to adjust */
+  }
+
+  .Brandspan span {
+    font-size: 9px;
+    padding: 2px 3px; /* Further reduce padding */
+  }
+
+  .RetailerImg {
+    min-height: 20px; /* Adjust for very small screens */
   }
 }

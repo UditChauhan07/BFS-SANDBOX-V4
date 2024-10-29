@@ -224,7 +224,7 @@
 
 @media (max-width: 650px) {
   .dGrid {
-    grid-template-columns: repeat(2, 1fr); /* Ensure 2 items per row on smaller screens */
+    grid-template-columns: 1fr; /* Stack items on small screens */
   }
   
   .brandHolder {
@@ -233,9 +233,6 @@
   
   .titleHolder {
     font-size: 12px; /* Further adjust font size for mobile */
-  }
-  .priceFor{
-    font-size: 12px;
   }
   
   .priceHolder {
@@ -253,5 +250,36 @@
 
   .soonHolder {
     font-size: 5px; /* Adjust for smaller screens */
+  }
+}
+
+@media (max-width: 400px) {
+  .imgHolder {
+    width: 100%; /* Full width on very small screens */
+  }
+
+  .brandHolder {
+    font-size: 10px; /* Further adjust font size */
+  }
+
+  .titleHolder {
+    font-size: 10px; /* Further adjust font size */
+  }
+
+  .priceHolder {
+    font-size: 16px; /* Further adjust font size */
+  }
+
+  .modalButton {
+    font-size: 10px; /* Adjust button font size */
+  }
+
+  .btnHolder {
+    height: 28px; /* Further adjust button height */
+    font-size: 10px; /* Adjust button font size */
+  }
+
+  .soonHolder {
+    font-size: 4px; /* Adjust for very small screens */
   }
 }

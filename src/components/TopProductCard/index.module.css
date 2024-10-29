@@ -160,6 +160,7 @@
   display: grid;
   place-content: center;
 }
+
 .modalButton {
   color: #fff;
   font-family: Montserrat-600;
@@ -200,6 +201,8 @@
     left: 125%;
   }
 }
+
+/* Media Queries for Responsiveness */
 @media (max-width: 1200px) {
   .dGrid {
     grid-template-columns: repeat(auto-fill, minmax(24%, 1fr));
@@ -214,30 +217,30 @@
 
 @media (max-width: 650px) {
   .dGrid {
-    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+    grid-template-columns: 1fr; /* Show one product per row */
   }
+
   .titleHolder {
     font-size: 12px;
   }
-  .priceFor{
-    padding-left: 9px;
-  }
+
   .brandHolder {
     font-size: 15px;
   }
 
   .imgHolder {
-    width: 100%;
-    height: auto;
+    width: 100%; /* Full width for the image */
+    height: auto; /* Maintain aspect ratio */
   }
 
   .btnHolder {
     width: 100%;
-    margin: 10px 0;
+    margin: 10px 0; /* Margin around buttons */
   }
 }
-@media (max-width:360px){
-.priceFor{
-  padding-left: 1px;
-}
+
+@media (max-width: 360px) {
+  .priceFor {
+    padding-left: 1px;
+  }
 }
