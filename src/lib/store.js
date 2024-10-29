@@ -1,9 +1,7 @@
-// export const originAPi = process.env.REACT_APP_OA_URL || "https://temp.beautyfashionsales.com"
-
 import axios from "axios";
-
-// export const originAPi = "https://dev.beautyfashionsales.com"
-export const originAPi = "http://localhost:2611";
+// export const originAPi = process.env.REACT_APP_OA_URL || "https://temp.beautyfashionsales.com"
+export const originAPi = "https://sandbox.beautyfashionsales.com"
+// export const originAPi = "http://localhost:2611";
 let url = `${originAPi}/retailer/`;
 let url2 = `${originAPi}/retailerv2/`;
 const orderKey = "orders";
@@ -299,12 +297,12 @@ export function supportClear() {
 }
 
 export async function DestoryAuth() {
-  // for (var key in localStorage) {
-  //   if (localStorage.hasOwnProperty(key) && (key != "AA0KfX2OoNJvz7x" && key != "passwordB2B" && key != "emailB2B")) {
-  //     localStorage.removeItem(key);
-  //   }
-  // }
-  // window.location.href = window.location.origin;
+  for (var key in localStorage) {
+    if (localStorage.hasOwnProperty(key) && (key != "AA0KfX2OoNJvz7x" && key != "passwordB2B" && key != "emailB2B")) {
+      localStorage.removeItem(key);
+    }
+  }
+  window.location.href = window.location.origin;
   return true;
 }
 
