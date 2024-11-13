@@ -21,7 +21,7 @@ function LaunchCalendar({ productList, selectBrand, brand, month }) {
   // }, [selectBrand]);
 
   const [productDetailId, setProductDetailId] = useState();
-  const [filterData, setFilterData] = useState()
+  const [filterData, setFilterData] = useState();
   useEffect(() => {
     if (!month && !selectBrand) {
       const newValues = productList?.map((months) => {
@@ -73,6 +73,7 @@ function LaunchCalendar({ productList, selectBrand, brand, month }) {
         if (filterData.length > 0) {
           isEmptyFlag = false;
         }
+        console.log(filterData,"filterdata")
         // Create a new object with filtered content
         return { ...months, content: filterData };
       });
