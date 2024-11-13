@@ -162,6 +162,65 @@ const MarketingCalendar = () => {
     })
   }
 
+  const generatePdfServerSide1 = (version = 0) => {
+    setPDFIsloaed(true);  // Show loader when the PDF generation starts
+
+    GetAuthData().then((user) => {
+        let manufacturerId = null;
+        let manufacturerStr = "";
+        brand.map((item, index) => {
+            manufacturerStr += "'" + item.Id + "'";
+            if (index !== brand.length - 1) {
+                manufacturerStr += ", ";
+            }
+            if (item?.Name?.toLowerCase() === selectBrand?.toLowerCase()) {
+                manufacturerId = item.Id;
+            }
+        });
+
+        const payload = {
+            key: user.data.x_access_token,
+            manufacturerId,
+            month,
+            manufacturerStr,
+            year: selectYear,
+        };
+
+        fetch(`${originAPi}/mIRX7B9FlQjmOaf/Finmh4OvrI0Yc46`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Trigger the file to open in a new tab once response is successful
+                response.blob().then(blob => {
+                    const a = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    a.href = url;
+                    a.target = '_blank';  // Open PDF in a new tab
+                    a.click();  // Programmatically trigger the opening of the PDF
+                    URL.revokeObjectURL(url);  // Release the object URL to clean up
+                    setPDFIsloaed(false);  // Hide loader after the action is done
+                });
+            } else {
+                throw new Error('PDF generation failed');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            setPDFIsloaed(false);  // Hide loader in case of error
+            alert('Failed to generate the PDF');
+        });
+    }).catch((userErr) => {
+        console.log('User Error:', userErr);
+        setPDFIsloaed(false);  // Hide loader in case of authentication error
+        alert('Failed to authenticate user');
+    });
+};
+
   // ...............................
   const generatePdf = () => {
     const element = document.getElementById('CalenerContainer'); // The HTML element you want to convert
@@ -258,7 +317,7 @@ const MarketingCalendar = () => {
     <AppLayout
       filterNodes={
         <>
-                  <FilterItem
+           <FilterItem
             label="year"
             name="Year"
             value={selectYear}

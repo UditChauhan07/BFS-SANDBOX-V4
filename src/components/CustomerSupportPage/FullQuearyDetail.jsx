@@ -218,7 +218,12 @@ function FullQuearyDetail({ data, setRest,attachmentUrls }) {
                             <div className={Detail.RecordType}>
                 <h3>Attachments</h3>
 
-                <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+                <ul   style={{
+            listStyleType: "disc",
+            paddingLeft: "20px",
+            maxHeight: "280px", 
+            overflowY: attachmentUrls && attachmentUrls.length > 8 ? "auto" : "visible",
+        }}>
                   {attachmentUrls && attachmentUrls.length > 0 ? (
                    attachmentUrls.map((attachment, index) => (
                       <li key={index}>

@@ -83,6 +83,13 @@ const CustomerService = () => {
     },
   ];
 
+  useEffect(() => {
+    if (confirm) {
+      document.body.style.overflow = 'hidden'; 
+    } else {
+      document.body.style.overflow = 'auto'; 
+    }
+  }, [confirm]); 
   function sortingList(data) {
     data.sort(function (a, b) {
       return new Date(b.CreatedDate) - new Date(a.CreatedDate);
@@ -203,9 +210,7 @@ const CustomerService = () => {
                         setLoading(false);
                         console.log(fileUploader, "fileUploader");
                         if (fileUploader) {
-                          navigate("/CustomerSupportDetails", {
-                            state: { id: response },
-                          });
+                          navigate("/CustomerSupportDetails?id=" + response);
                         }
                       })
                       .catch((fileErr) => {
@@ -214,9 +219,7 @@ const CustomerService = () => {
                       });
                   } else {
                     setIsDisabled(false);
-                    navigate("/CustomerSupportDetails", {
-                      state: { id: response },
-                    });
+                    navigate("/CustomerSupportDetails?id=" + response);
                   }
                 }
               }

@@ -10,8 +10,8 @@ const CustomerSupportDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [reset, setRest] = useState(false);
-  
-  const { id: detailsId } = location.state || {};
+  const queryParams = new URLSearchParams(location.search);
+  const detailsId = queryParams.get("id");
   const [detailsData, setDetailsData] = useState({});
   const [attachmentUrls, setAttachmentUrls] = useState([]);
   const [isLoadingAttachments, setLoadingAttachments] = useState(false);

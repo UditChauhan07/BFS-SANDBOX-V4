@@ -1,6 +1,6 @@
 // export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com"
-// export const originAPi = "http://localhost:2611"
 import axios from "axios";
+// export const originAPi = "http://localhost:2611"
 export const originAPi="https://staging.beautyfashionsales.com"
 
 let url = `${originAPi}/retailer/`;
