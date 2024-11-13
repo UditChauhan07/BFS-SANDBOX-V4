@@ -217,7 +217,7 @@ const MarketingCalendar = () => {
         .catch((error) => {
             console.error('Error:', error);
             setPDFIsloaed(false);  // Hide loader in case of error
-            alert('Failed to generate the PDF');
+            // alert('Failed to generate the PDF');
         });
     }).catch((userErr) => {
         console.log('User Error:', userErr);
