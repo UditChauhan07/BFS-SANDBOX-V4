@@ -83,13 +83,13 @@ const CustomerService = () => {
     },
   ];
 
-  useEffect(() => {
-    if (confirm) {
-      document.body.style.overflow = 'hidden'; 
-    } else {
-      document.body.style.overflow = 'auto'; 
-    }
-  }, [confirm]); 
+  // useEffect(() => {
+  //   if (confirm) {
+  //     document.body.style.overflow = 'hidden'; 
+  //   } else {
+  //     document.body.style.overflow = 'auto'; 
+  //   }
+  // }, [confirm]); 
   function sortingList(data) {
     data.sort(function (a, b) {
       return new Date(b.CreatedDate) - new Date(a.CreatedDate);
