@@ -374,7 +374,7 @@ const MarketingCalendar = () => {
             </div>
             <ul className="dropdown-menu">
               <li>
-                <div className="dropdown-item text-start" onClick={() => { setPDFIsloaed(true);generatePdfServerSide()}}>&nbsp;Pdf</div>
+                <div className="dropdown-item text-start" onClick={() => { setPDFIsloaed(true);generatePdfServerSide1()}}>&nbsp;Pdf</div>
               </li>
               <li>
                 <div className="dropdown-item text-start" onClick={() => { setPDFIsloaed(true);generatePdfServerSide(1)}}>&nbsp;PDF Quickview 1</div>
