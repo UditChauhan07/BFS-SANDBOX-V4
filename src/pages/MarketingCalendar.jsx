@@ -195,13 +195,18 @@ const MarketingCalendar = () => {
         })
         .then(response => {
             if (response.ok) {
-                // Trigger the file to open in a new tab once response is successful
+                // Trigger the file download directly
                 response.blob().then(blob => {
+                    // Create a new Date object to get the current timestamp
+                    const currentDate = new Date();
+                    const formattedDate = currentDate.toUTCString().replace(/ /g, "_").replace(/,/g, "").split("GMT")[0];
+
+                    // Create a download link
                     const a = document.createElement('a');
                     const url = URL.createObjectURL(blob);
                     a.href = url;
-                    a.target = '_blank';  // Open PDF in a new tab
-                    a.click();  // Programmatically trigger the opening of the PDF
+                    a.download = `Marketing_Calendar_${formattedDate}.pdf`;  // Set dynamic file name with date/time
+                    a.click();  // Trigger the download
                     URL.revokeObjectURL(url);  // Release the object URL to clean up
                     setPDFIsloaed(false);  // Hide loader after the action is done
                 });
@@ -220,6 +225,8 @@ const MarketingCalendar = () => {
         alert('Failed to authenticate user');
     });
 };
+
+
 
   // ...............................
   const generatePdf = () => {
