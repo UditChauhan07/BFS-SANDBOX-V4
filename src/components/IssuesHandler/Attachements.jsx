@@ -1,7 +1,8 @@
-
 import { BiLock, BiSave, BiUpload } from "react-icons/bi";
-import { AiOutlineFilePdf, AiOutlineVideoCamera } from "react-icons/ai"; // Add icons for PDF and Video
+import { AiOutlineFilePdf, AiOutlineVideoCamera } from "react-icons/ai";
+import { FaFileExcel } from "react-icons/fa";
 import Styles from "./Attachements.module.css";
+import { MdImage } from "react-icons/md";
 
 const Attachements = ({
   title = true,
@@ -42,10 +43,17 @@ const Attachements = ({
   const ImageSlider = () => {
     return files.map((file, index) => {
       const fileType = file.file.type;
-      const isImage = fileType.startsWith("image/");
+      const fileName = file.file.name.toLowerCase();
+      const isImage =
+        fileType.startsWith("image/") ||
+        fileName.endsWith(".jpg") ||
+        fileName.endsWith(".jpeg") ||
+        fileName.endsWith(".png") ||
+        fileName.endsWith(".gif");
+      const isJFIF = fileName.endsWith(".jfif");
       const isPDF = fileType === "application/pdf";
       const isVideo = fileType.startsWith("video/");
-
+      const isExcel = fileName.endsWith(".xls") || fileName.endsWith(".xlsx");
       return (
         <div key={index} style={{ position: "relative" }}>
           <span
@@ -62,19 +70,42 @@ const Attachements = ({
           >
             x
           </span>
-          <a href={file.preview} target="_blank" title="Click to Download" rel="noreferrer">
-            {isImage ? (
-              <img src={file.preview} alt={file.file.name} />
+          <a
+            href={file.preview}
+            target="_blank"
+            title="Click to Download"
+            rel="noreferrer"
+          >
+            {isImage || isJFIF ? (
+              <div className={Styles.fileIcon}>
+                <img
+                  src={file.preview}
+                  alt={file.file.name}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "200px",
+                    objectFit: "contain",
+                  }}
+                  className={Styles.imagePreview}
+                />
+              </div>
             ) : isPDF ? (
               <div className={Styles.fileIcon}>
-                <AiOutlineFilePdf size={48} color="#FF0000" />
+                <AiOutlineFilePdf size={48} color="#000000" />
               </div>
             ) : isVideo ? (
               <div className={Styles.fileIcon}>
-                <AiOutlineVideoCamera size={48} color="#0000FF" />
+                <AiOutlineVideoCamera size={48} color="#000000" />
+              </div>
+            ) : isExcel ? (
+              <div className={Styles.fileIcon}>
+                <FaFileExcel size={48} color="#000000" />
               </div>
             ) : (
-              <div className={Styles.fileIcon}>File</div>
+              <div className={Styles.fileIcon}>
+                <MdImage size={48} color="#000000" />{" "}
+                {/* Default image icon for unknown files */}
+              </div>
             )}
           </a>
         </div>
@@ -123,10 +154,17 @@ const Attachements = ({
             </div>
             <div className={Styles.attachHolder}>
               <p className={Styles.subTitle}>Upload some attachments</p>
+
               <label className={Styles.attachLabel} htmlFor="attachement">
                 <div>
                   <div className={Styles.attachLabelDiv}>
-                    <BiUpload />
+                    {files.length > 0 ? (
+                      <p className={Styles.countText}>
+                       Selected Items: {files.length}
+                      </p>
+                    ) : (
+                      <BiUpload />
+                    )}
                   </div>
                 </div>
               </label>

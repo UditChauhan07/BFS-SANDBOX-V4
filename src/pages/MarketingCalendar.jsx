@@ -19,6 +19,7 @@ const MarketingCalendar = () => {
   const [isPDFLoaded, setPDFIsloaed] = useState(false);
   const [pdfLoadingText, setPdfLoadingText] = useState(".");
   const [productList, setProductList] = useState([]);
+  console.log(productList,"productLusrt")
   const [month, setMonth] = useState("");
   let months = [
     { value: null, label: "All" },
@@ -186,7 +187,7 @@ const MarketingCalendar = () => {
             year: selectYear,
         };
 
-        fetch(`${originAPi}/mIRX7B9FlQjmOaf/Finmh4OvrI0Yc46`, {
+        fetch(`${originAPi}/mIRX7B9FlQjmOaf/Finmh4OvrI0Yc467`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

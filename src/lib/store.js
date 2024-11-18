@@ -1,8 +1,8 @@
 // export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com"
 import axios from "axios";
 // export const originAPi = "http://localhost:2611"
-export const originAPi="https://staging.beautyfashionsales.com"
-// export const originAPi="https://sandbox.beautyfashionsales.com"
+// export const originAPi="https://staging.beautyfashionsales.com"
+export const originAPi="https://sandbox.beautyfashionsales.com"
 
 let url = `${originAPi}/retailer/`;
 let url2 = `${originAPi}/retailerv2/`;
@@ -980,6 +980,7 @@ export async function getAllAccountSupport({ key, accountIds }) {
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
+  console.log(data,"abcd")
   if (data.status == 300) {
     DestoryAuth();
   } else {

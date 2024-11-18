@@ -183,10 +183,11 @@ function MyBagFinal() {
             OrderPlaced({ order: begToOrder, cartId: order.id })
               .then((response) => {
                 if (response) {
-                  if (response.length) {
-                    setIsDisabled(false)
+                  if (response.status === 200) {
+                    setIsDisabled(false);
                     setIsOrderPlaced(0);
-                    setorderStatus({ status: true, message: response[0].message });
+                    setorderStatus({ status: true, message: response.order });
+                    navigate("/order-list");
                   } else {
                     setIsDisabled(false)
                     let status = deleteOrder();

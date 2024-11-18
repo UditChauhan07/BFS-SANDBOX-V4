@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import Styles from "./Styles.module.css";
-const Modal = ({ isOpen, onClose, children, title = false,styles=null }) => {
+const Modal = ({ isOpen, onClose, children, title = false,styles=null,loading = false }) => {
+  const handleOverlayClick = (e) => {
+    if (loading) {
+      e.stopPropagation(); // Prevent closing if loading
+    } else {
+      onClose(); // Allow closing if not loading
+    }
+  };
   return (
     <>
       {isOpen && (
-        <div className={Styles.modalOverlay} style={{...styles}} onClick={onClose}>
+        <div className={Styles.modalOverlay} style={{...styles}} onClick={handleOverlayClick}>
           <div
             className={`${Styles.modal} `}
             onClick={(e) => {

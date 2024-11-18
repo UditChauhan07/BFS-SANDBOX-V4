@@ -149,10 +149,105 @@ const CustomerService = () => {
       });
   }, []);
 
+  // const SubmitHandler = (event) => {
+  //   event.preventDefault();
+  //   setIsDisabled(true);
+  //   setLoading(true);
+  //   GetAuthData()
+  //     .then((user) => {
+  //       if (user) {
+  //         let errorlistObj = Object.keys(errorList);
+  //         let systemStr = "";
+  //         if (errorlistObj.length) {
+  //           errorlistObj.map((id) => {
+  //             systemStr += `${errorList[id].Name}(${errorList[id].ProductCode}) having ${reason} for`;
+  //             if (reason != "Charges" && errorList[id]?.Quantity) {
+  //               systemStr += ` ${errorList[id].issue} out of ${errorList[id].Quantity} Qty.\n`;
+  //             } else {
+  //               systemStr += ` ${errorList[id].Quantity} Qty.\n`;
+  //             }
+  //           });
+  //         }
+  //         let newDesc = "";
+  //         if (systemStr != "") {
+  //           newDesc = "Issue Desc:" + systemStr;
+  //           if (desc)
+  //             newDesc = "User Desc:" + desc + " \n Issue Desc:" + systemStr;
+  //         } else {
+  //           newDesc = desc;
+  //         }
+
+  //         let rawData = {
+  //           orderStatusForm: {
+  //             typeId: "0123b0000007z9pAAA",
+  //             reason: reason,
+  //             salesRepId,
+  //             contactId: user.data.retailerId,
+  //             accountId,
+  //             opportunityId: orderId,
+  //             manufacturerId,
+  //             desc: newDesc,
+  //             priority: "Medium",
+  //             sendEmail,
+  //             subject,
+  //             Actual_Amount__c,
+  //           },
+  //           key: user.data.x_access_token,
+  //         };
+  //          postSupportAny({ rawData })
+  //           .then((response) => {
+  //             if (response) {
+  //               if (response) {
+  //                 if (files.length > 0) {
+  //                   setIsDisabled(false);
+  //                   uploadFileSupport({
+  //                     key: user.x_access_token,
+  //                     supportId: response,
+  //                     files,
+  //                   })
+  //                     .then((fileUploader) => {
+  //                       setIsDisabled(false);
+  //                       setLoading(false);
+  //                       console.log(fileUploader, "fileUploader");
+  //                       if (fileUploader) {
+  //                         navigate("/CustomerSupportDetails?id=" + response);
+  //                       }
+  //                     })
+  //                     .catch((fileErr) => {
+  //                       console.log({ fileErr });
+  //                       setLoading(false);
+  //                     });
+  //                 } else {
+  //                   setIsDisabled(false);
+  //                   navigate("/CustomerSupportDetails?id=" + response);
+  //                 }
+  //               }
+  //             }
+  //           })
+  //           .catch((err) => {
+  //             console.error({ err });
+  //             setLoading(false);
+  //           });
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //       setLoading(false);
+  //     });
+  // };
+
+
   const SubmitHandler = (event) => {
     event.preventDefault();
     setIsDisabled(true);
     setLoading(true);
+    document.body.style.overflow = "hidden";
+    document.body.style.pointerEvents = "none"; 
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.style.filter = "blur(5px)";
+    }
+
     GetAuthData()
       .then((user) => {
         if (user) {
@@ -161,7 +256,7 @@ const CustomerService = () => {
           if (errorlistObj.length) {
             errorlistObj.map((id) => {
               systemStr += `${errorList[id].Name}(${errorList[id].ProductCode}) having ${reason} for`;
-              if (reason != "Charges" && errorList[id]?.Quantity) {
+              if (reason !== "Charges" && errorList[id]?.Quantity) {
                 systemStr += ` ${errorList[id].issue} out of ${errorList[id].Quantity} Qty.\n`;
               } else {
                 systemStr += ` ${errorList[id].Quantity} Qty.\n`;
@@ -169,14 +264,12 @@ const CustomerService = () => {
             });
           }
           let newDesc = "";
-          if (systemStr != "") {
+          if (systemStr !== "") {
             newDesc = "Issue Desc:" + systemStr;
-            if (desc)
-              newDesc = "User Desc:" + desc + " \n Issue Desc:" + systemStr;
+            if (desc) newDesc = "User Desc:" + desc + " \n Issue Desc:" + systemStr;
           } else {
             newDesc = desc;
           }
-
           let rawData = {
             orderStatusForm: {
               typeId: "0123b0000007z9pAAA",
@@ -194,45 +287,57 @@ const CustomerService = () => {
             },
             key: user.data.x_access_token,
           };
-           postSupportAny({ rawData })
+          postSupportAny({ rawData })
             .then((response) => {
               if (response) {
-                if (response) {
-                  if (files.length > 0) {
-                    setIsDisabled(false);
-                    uploadFileSupport({
-                      key: user.x_access_token,
-                      supportId: response,
-                      files,
+                if (files.length > 0) {
+                  uploadFileSupport({
+                    key: user.x_access_token,
+                    supportId: response,
+                    files,
+                  })
+                    .then((fileUploader) => {
+                      setIsDisabled(false);
+                      setLoading(false);
+                      document.body.style.pointerEvents = ""; 
+                      document.body.style.overflow = ""; 
+                      if (modalBackdrop) modalBackdrop.style.filter = ""; 
+                      if (fileUploader) {
+                        navigate("/CustomerSupportDetails?id=" + response);
+                      }
                     })
-                      .then((fileUploader) => {
-                        setIsDisabled(false);
-                        setLoading(false);
-                        console.log(fileUploader, "fileUploader");
-                        if (fileUploader) {
-                          navigate("/CustomerSupportDetails?id=" + response);
-                        }
-                      })
-                      .catch((fileErr) => {
-                        console.log({ fileErr });
-                        setLoading(false);
-                      });
-                  } else {
-                    setIsDisabled(false);
-                    navigate("/CustomerSupportDetails?id=" + response);
-                  }
+                    .catch((fileErr) => {
+                      console.error({ fileErr });
+                      setLoading(false);
+                      document.body.style.pointerEvents = "";
+                      document.body.style.overflow = "";
+                      if (modalBackdrop) modalBackdrop.style.filter = "";
+                    });
+                } else {
+                  setIsDisabled(false);
+                  setLoading(false);
+                  document.body.style.pointerEvents = "";
+                  document.body.style.overflow = "";
+                  if (modalBackdrop) modalBackdrop.style.filter = "";
+                  navigate("/CustomerSupportDetails?id=" + response);
                 }
               }
             })
             .catch((err) => {
               console.error({ err });
               setLoading(false);
+              document.body.style.pointerEvents = "";
+              document.body.style.overflow = "";
+              if (modalBackdrop) modalBackdrop.style.filter = "";
             });
         }
       })
       .catch((error) => {
         console.log(error);
         setLoading(false);
+        document.body.style.pointerEvents = "";
+        document.body.style.overflow = "";
+        if (modalBackdrop) modalBackdrop.style.filter = "";
       });
   };
   if (sumitForm)

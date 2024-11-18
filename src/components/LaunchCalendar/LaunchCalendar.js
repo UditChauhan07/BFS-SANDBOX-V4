@@ -22,6 +22,7 @@ function LaunchCalendar({ productList, selectBrand, brand, month }) {
 
   const [productDetailId, setProductDetailId] = useState();
   const [filterData, setFilterData] = useState();
+  console.log(filterData,"filterData")
   useEffect(() => {
     if (!month && !selectBrand) {
       const newValues = productList?.map((months) => {

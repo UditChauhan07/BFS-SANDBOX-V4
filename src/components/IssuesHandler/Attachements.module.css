@@ -61,6 +61,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, 100px);
   gap: 5px;
+  justify-content: center !important;
 }
 .imgHolder img {
   width: 100px;
