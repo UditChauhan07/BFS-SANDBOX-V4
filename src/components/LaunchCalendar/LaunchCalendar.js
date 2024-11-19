@@ -81,7 +81,7 @@ function LaunchCalendar({ productList, selectBrand, brand, month }) {
       setIsEmpty(isEmptyFlag);
       setFilterData(newValues);
     }
-// console.log(jeiioopppppppppppppppppp                       fbbbbbbbbbbbbbbbb)
+
   }, [month, selectBrand, productList, brand]);
 
   const ImageWithFallback = ({ src, alt, fallback,className,style }) => {
