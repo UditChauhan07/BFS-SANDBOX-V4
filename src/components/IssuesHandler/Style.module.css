@@ -22,8 +22,10 @@
   display: flex;
   justify-content: center !important; /* Horizontally center the images */     /* Vertically center the images */
   flex-wrap: wrap;         /* Allow images to wrap if there's too much space */
-  width: 100%;             /* Ensure the parent takes up the full width */
+  width: 100%; 
+  justify-content: center !important;            /* Ensure the parent takes up the full width */
 }
+
 
 .fileIcon {
   width: 100px;           /* Width of each image */

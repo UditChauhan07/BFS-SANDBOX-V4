@@ -143,6 +143,7 @@ tr th{
   display: grid;
   grid-template-columns: repeat(auto-fill, 115px);
   gap: 10px;
+  justify-content: center !important;
 }
 .imgHolder img {
   width: 100px;

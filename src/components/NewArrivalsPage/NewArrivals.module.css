@@ -66,6 +66,7 @@
   height: 175px;
   object-fit: contain;
   cursor: pointer;
+  justify-content: center !important;
 }
 .brandHolder {
   margin-top: 1rem;

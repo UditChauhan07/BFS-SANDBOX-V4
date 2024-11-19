@@ -198,7 +198,13 @@ const AccountInfo = ({ reason, Accounts, postSupportAny, GetAuthData, dSalesRepI
                         <ErrorMessage component={TextError} name="description" />
                         <div className={styles.attachHolder}>
                             <p className={styles.subTitle}>upload some attachments</p>
-                            <label className={styles.attachLabel} for="attachement"><div><div className={styles.attachLabelDiv}><BiUpload /></div></div></label>
+                            <label className={styles.attachLabel} for="attachement"><div><div className={styles.attachLabelDiv}>   {files.length > 0 ? (
+                      <p className={styles.countText}>
+                       Selected Items: {files.length}
+                      </p>
+                    ) : (
+                      <BiUpload />
+                    )}</div></div></label>
                             <input type="file" style={{ width: 0, height: 0 }} id="attachement" onChange={handleChange} multiple accept="image/*" />
                             <div className={styles.imgHolder}>
                                 {files.map((file, index) => (
